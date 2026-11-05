@@ -35,6 +35,8 @@ El contrato del proyecto (stack, reglas, arquitectura) vive en `AGENTS.md`. `CLA
 ```
 
 - **Claude Code** lee `CLAUDE.md`, y sus imports con `@ruta` cargan el archivo importado. La [documentación de memoria de Claude Code](https://code.claude.com/docs/en/memory) describe `@AGENTS.md` como uso habitual. Las líneas `@ruta` dentro de bloques de código no cuentan como import.
+  - **Probado** con Claude Code 2.1.318: un `CLAUDE.md` que solo importa `contrato-prueba.md` hace que la CLI conozca su contenido; sin ese import, no.
+  - **Observado, no garantizado:** en esa misma versión, un directorio con solo `AGENTS.md` también dejó que la CLI conociera su contenido. Una sola prueba y no está en la documentación que consulté, así que el contrato sigue exigiendo el import.
 - **Codex CLI** lee `AGENTS.md` de forma nativa, según las fuentes que consulté. No lo probé aquí.
 - **Gemini CLI** lee `GEMINI.md` por defecto. Según una fuente, se puede apuntar a `AGENTS.md` con `context.fileName` en su configuración. No lo verifiqué contra la documentación oficial.
 
@@ -44,7 +46,7 @@ El contrato del proyecto (stack, reglas, arquitectura) vive en `AGENTS.md`. `CLA
 
 | CLI | Estado | Qué está probado |
 |---|---|---|
-| Claude Code | Probada | Modo headless con el orquestador: un revisor de solo lectura, `Bash` disponible, `Write` no disponible, veredicto parseado. El import de `CLAUDE.md` está documentado, pero no lo probé con un proyecto real. |
+| Claude Code | Probada | Modo headless con el orquestador: un revisor de solo lectura, `Bash` disponible, `Write` no disponible, veredicto parseado. El import de `CLAUDE.md` funciona: probado con un archivo de otro nombre. |
 | Codex CLI | Sin probar | No está instalada en el entorno donde se desarrolló esto. La entrada no existe en `config/cli.json`. |
 | Gemini CLI | Sin probar | Igual que Codex. |
 | Otras | Sin probar | Se agregan con el procedimiento de abajo. |
