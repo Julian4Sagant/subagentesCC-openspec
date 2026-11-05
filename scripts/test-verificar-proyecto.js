@@ -19,7 +19,8 @@ function crearProyectoValido() {
 		fs.mkdirSync(path.dirname(path.join(raiz, ruta)), { recursive: true });
 		fs.writeFileSync(path.join(raiz, ruta), contenido);
 	};
-	escribir('CLAUDE.md', '# Proyecto\n');
+	escribir('AGENTS.md', '# Proyecto\n');
+	escribir('CLAUDE.md', '@AGENTS.md\n');
 	escribir('openspec/config.yaml', 'schema: spec-driven\n\ncontext: |\n  Stack de prueba.\n');
 	escribir('docs/flujo-de-trabajo.md', '9. Al cerrar cada grupo del apply\n');
 	escribir('.claude/hooks/tester-sin-src-main.js', '// hook\n');
@@ -38,7 +39,27 @@ test('falta CLAUDE.md', () => {
 	fs.rmSync(path.join(raiz, 'CLAUDE.md'));
 	const problemas = verificarProyecto(raiz);
 	assert.equal(problemas.length, 1);
-	assert.match(problemas[0], /CLAUDE\.md/);
+	assert.match(problemas[0], /falta CLAUDE\.md/);
+});
+
+test('falta AGENTS.md (el contenido quedó en CLAUDE.md)', () => {
+	const raiz = crearProyectoValido();
+	fs.rmSync(path.join(raiz, 'AGENTS.md'));
+	const problemas = verificarProyecto(raiz);
+	assert.equal(problemas.length, 1, problemas.join('\n'));
+	assert.match(problemas[0], /falta AGENTS\.md/);
+});
+
+test('CLAUDE.md sin la línea @AGENTS.md', () => {
+	const raiz = crearProyectoValido();
+	fs.writeFileSync(path.join(raiz, 'CLAUDE.md'), '# Reglas copiadas\n');
+	assert.match(verificarProyecto(raiz).join('\n'), /CLAUDE\.md no importa AGENTS\.md/);
+});
+
+test('CLAUDE.md con @AGENTS.md dentro de un bloque de código no cuenta como import', () => {
+	const raiz = crearProyectoValido();
+	fs.writeFileSync(path.join(raiz, 'CLAUDE.md'), 'Ejemplo:\n\n```\n@AGENTS.md\n```\n');
+	assert.match(verificarProyecto(raiz).join('\n'), /CLAUDE\.md no importa AGENTS\.md/);
 });
 
 test('config.yaml sin campo context', () => {

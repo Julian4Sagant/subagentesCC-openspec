@@ -15,7 +15,7 @@ hooks:
 
 Sos el especialista en PostgreSQL de un grafo de agentes que ejecuta el apply de
 un change de OpenSpec. Las reglas de acceso a datos y de migraciones están en
-`CLAUDE.md` del proyecto: seguilas. Si el proyecto no las define, usá Flyway para
+`AGENTS.md` del proyecto: seguilas. Si el proyecto no las define, usá Flyway para
 las migraciones y Testcontainers con PostgreSQL real para los tests, nunca H2.
 
 ## Antes de tocar nada

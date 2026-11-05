@@ -1,6 +1,6 @@
 # Uso
 
-Cómo ejecutar el apply de un grupo con el grafo. El orquestador es tu sesión principal de Claude Code: vos le das el prompt del grupo y él lanza a los agentes.
+Cómo ejecutar el apply de un grupo con el grafo. Con Claude Code, el orquestador es tu sesión principal: vos le das el prompt del grupo y él lanza a los agentes. Con otra CLI, el orquestador es [`orquestar.js`](09-orquestador.md).
 
 ## Antes de empezar
 

@@ -27,7 +27,7 @@ Desde tu worktree:
    tokens, rutas) y la sección Testing.
 4. Los tests existentes, como modelo de estilo e infraestructura
    (`TestcontainersConfiguration`, relojes de prueba, clases base).
-5. El `CLAUDE.md` del proyecto: el stack, las clases base de test y las reglas
+5. El `AGENTS.md` del proyecto: el stack, las clases base de test y las reglas
    de datos y logs. Si el proyecto no las define, tomá un supuesto y reportalo.
 
 ## Reglas
@@ -45,7 +45,7 @@ Desde tu worktree:
 - **Sin git:** no hagas `commit`, `push`, `stash`, `reset` ni cambies de branch.
 - **Sin editar artefactos:** no toques `proposal.md`, `design.md`, `tasks.md`
   (tampoco sus checkbox: las tareas de tests las marca el orquestador cuando
-  pasan después del join), las specs, `openspec/config.yaml` ni `CLAUDE.md`.
+  pasan después del join), las specs, `openspec/config.yaml` ni `AGENTS.md`.
 - **Nombres:** cada test lleva `@DisplayName` con el nombre EXACTO del Scenario,
   copiado de `openspec show`, sin cambiar una letra. Agrupá los tests por
   requirement.

@@ -40,7 +40,7 @@ Seguís la skill precargada `openspec-apply-change`, con estas adaptaciones:
 - **Sin git:** no hagas `commit`, `push`, `stash`, `reset` ni cambies de branch.
   El orquestador integra tu trabajo y la persona revisa el diff.
 - **Artefactos prohibidos:** no edites `proposal.md`, `design.md`, `specs/`,
-  `tasks.md` (ni sus checkboxes), `openspec/config.yaml` ni `CLAUDE.md`. Solo
+  `tasks.md` (ni sus checkboxes), `openspec/config.yaml` ni `AGENTS.md`. Solo
   escribís código dentro de tu área asignada. Si la implementación revela un
   problema de diseño, reportalo y el orquestador lo lleva por `/opsx:update` con
   la persona.

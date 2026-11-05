@@ -18,3 +18,5 @@
 6. [Casos de uso](06-casos-de-uso.md): siete situaciones reales y qué agentes lanzar en cada una.
 7. [Patrones](07-patrones.md): el contrato que cada proyecto cumple, roles y permisos, formatos fijos y cómo agregar un agente.
 8. [Skills de terceros](08-skills-terceros.md): las skills de mattpocock/skills incluidas, qué cambió en cada una y cuáles quedaron afuera.
+9. [Orquestador](09-orquestador.md): correr el apply con los roles y cualquier CLI de agentes configurable.
+10. [Portabilidad](10-portabilidad.md): qué es neutral respecto de la herramienta, qué sigue atado a Claude Code y qué está probado.

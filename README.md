@@ -1,6 +1,6 @@
 # Subagentes OpenSpec
 
-Cinco subagentes de Claude Code que se reparten el apply de un change de OpenSpec: uno implementa, otro escribe los tests desde la spec sin ver el código, otro revisa, y dos especialistas entran cuando hacen falta.
+Cinco subagentes que se reparten el apply de un change de OpenSpec: uno implementa, otro escribe los tests desde la spec sin ver el código, otro revisa, y dos especialistas entran cuando hacen falta.
 
 La idea central: **los tests verifican el contrato, no la implementación.** Si el mismo agente escribe el código y los tests, tiende a ajustar los tests hasta que pasan. Separando los roles, un test puede fallar de verdad cuando el código se desvía de la spec. Más en [Por qué un grafo](docs/01-por-que-un-grafo.md).
 
@@ -20,7 +20,7 @@ Desde PowerShell, dentro de la carpeta de este repo:
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Proyecto C:\ruta\al\proyecto
 ```
 
-Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-instalacion.md).
+Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-instalacion.md). Para otras CLIs de agentes, ver [Orquestador](docs/09-orquestador.md) y [Portabilidad](docs/10-portabilidad.md).
 
 ## Documentación
 
@@ -33,6 +33,7 @@ Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-ins
 - [Casos de uso](docs/06-casos-de-uso.md)
 - [Patrones](docs/07-patrones.md): el contrato de cada proyecto y las reglas que todos los agentes asumen
 - [Orquestador](docs/09-orquestador.md): corre el apply con los roles y cualquier CLI de agentes configurable
+- [Portabilidad](docs/10-portabilidad.md): qué es neutral respecto de la herramienta, qué sigue atado a Claude Code y qué está probado
 
 ## Contenido del repo
 

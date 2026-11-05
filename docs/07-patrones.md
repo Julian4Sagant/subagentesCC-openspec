@@ -1,11 +1,11 @@
 # Patrones
 
-Las formas de hacer las cosas que todos los agentes de este repo asumen. Cambiarlas es un cambio del repo, no de un proyecto: si un proyecto necesita otra cosa, lo resuelve en su `CLAUDE.md` o en su `openspec/config.yaml`.
+Las formas de hacer las cosas que todos los agentes de este repo asumen. Cambiarlas es un cambio del repo, no de un proyecto: si un proyecto necesita otra cosa, lo resuelve en su `AGENTS.md` o en su `openspec/config.yaml`.
 
 ## 1. Lo genérico va acá, lo del proyecto va en el proyecto
 
 - Este repo define **roles, permisos y formatos de reporte**. Son iguales para todos los proyectos.
-- Cada proyecto define su **stack, sus reglas y su arquitectura** en `CLAUDE.md`, `openspec/config.yaml` y `docs/flujo-de-trabajo.md`.
+- Cada proyecto define su **stack, sus reglas y su arquitectura** en `AGENTS.md`, `openspec/config.yaml` y `docs/flujo-de-trabajo.md`.
 - Nunca se edita a mano una copia instalada en `.claude/agents/`. El próximo instalador la pisa, y `verificar-proyecto.js` la marca como desviada.
 
 ## 2. El contrato de un proyecto
@@ -14,7 +14,7 @@ Un proyecto está listo para los agentes cuando `node scripts/verificar-proyecto
 
 | Qué | Por qué |
 |---|---|
-| `CLAUDE.md` | Stack y reglas, que leen el tester, el revisor, el security-auditor y el postgres-pro. |
+| `AGENTS.md` (y `CLAUDE.md` con la línea `@AGENTS.md`) | Stack y reglas, que leen el tester, el revisor, el security-auditor y el postgres-pro. |
 | `openspec/config.yaml` con `context:` | Arquitectura y contrato, que lee el implementador. |
 | `docs/flujo-de-trabajo.md` con "Al cerrar cada grupo del apply" | El criterio de cierre que usa el revisor. |
 | `.claude/hooks/tester-sin-src-main.js` | Sin él, el tester puede leer `src/main`. |

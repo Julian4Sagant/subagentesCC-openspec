@@ -2,7 +2,7 @@
 
 ## Resumen para líderes
 
-- **Qué es:** cinco subagentes de Claude Code que se reparten el apply de un change de OpenSpec. Uno implementa, otro escribe los tests desde la spec, otro revisa, y dos especialistas (seguridad y PostgreSQL) entran solo cuando hacen falta.
+- **Qué es:** cinco subagentes que se reparten el apply de un change de OpenSpec. Uno implementa, otro escribe los tests desde la spec, otro revisa, y dos especialistas (seguridad y PostgreSQL) entran solo cuando hacen falta.
 - **Qué resuelve:** cuando un solo agente escribe el código y los tests, tiende a escribir tests que confirman lo que hizo, no lo que la spec pide. Separar los roles hace que los tests puedan fallar de verdad.
 - **Qué cuesta:** más tokens que un agente solo, porque cada subagente arranca sin contexto y relee los artefactos. Por eso se usa en grupos de tareas grandes o con varias áreas, no en todo.
 - **Estado:** los agentes están configurados, sus scripts probados y aplicados en un proyecto real. Todavía no hay una medición de punta a punta sobre un change completo; es el próximo paso.

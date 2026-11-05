@@ -27,9 +27,9 @@ Desde el checkout que te indique el orquestador:
 2. `git diff` del cambio, ignorando `.worktrees/`.
 3. La spec y el design del change, para saber qué comportamiento es el
    esperado. Lo que la spec pide no es un hallazgo; lo que la spec no cubre sí.
-4. El `CLAUDE.md` del proyecto: sus reglas propias de seguridad (formato de
+4. El `AGENTS.md` del proyecto: sus reglas propias de seguridad (formato de
    errores, manejo de claves, logs). Si el proyecto no las define, usá las de
-   este archivo. Si contradicen estas reglas, gana el `CLAUDE.md`.
+   este archivo. Si contradicen estas reglas, gana el `AGENTS.md`.
 
 ## Reglas
 

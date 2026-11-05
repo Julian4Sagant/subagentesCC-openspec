@@ -15,13 +15,27 @@ function normalizar(texto) {
 	return texto.replace(/\r\n/g, '\n');
 }
 
+/** Verdadero si el texto importa el archivo con una línea `@archivo`, fuera de bloques de código. */
+function tieneImport(texto, archivo) {
+	const sinCodigo = texto.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+	const escapado = archivo.replace(/\./g, '\\.');
+	return new RegExp(`^@${escapado}\\s*$`, 'm').test(sinCodigo);
+}
+
 /** Devuelve la lista de problemas del proyecto. Vacía si cumple el contrato. */
 function verificarProyecto(raizProyecto) {
 	const problemas = [];
 	const existe = (ruta) => fs.existsSync(path.join(raizProyecto, ruta));
 
+	// El contrato vive en AGENTS.md, que leen todas las CLIs. CLAUDE.md solo lo importa para Claude Code.
+	if (!existe('AGENTS.md')) {
+		problemas.push('falta AGENTS.md: ahí van el stack y las reglas que leen los agentes (si están en CLAUDE.md, pasalas a AGENTS.md)');
+	}
 	if (!existe('CLAUDE.md')) {
-		problemas.push('falta CLAUDE.md: los agentes leen el stack y las reglas de ahí');
+		problemas.push('falta CLAUDE.md con la línea @AGENTS.md: sin ella, Claude Code no lee el contrato');
+	}
+	else if (!tieneImport(fs.readFileSync(path.join(raizProyecto, 'CLAUDE.md'), 'utf8'), 'AGENTS.md')) {
+		problemas.push('CLAUDE.md no importa AGENTS.md: agregá la línea @AGENTS.md');
 	}
 
 	if (!existe('openspec/config.yaml')) {
@@ -50,7 +64,7 @@ function verificarProyecto(raizProyecto) {
 		const fuente = normalizar(fs.readFileSync(path.join(carpetaAgentes, archivo), 'utf8'));
 		const instalada = normalizar(fs.readFileSync(path.join(raizProyecto, copia), 'utf8'));
 		if (fuente !== instalada) {
-			problemas.push(`${copia} no coincide con agents/${archivo}: si tenía secciones propias, movelas al CLAUDE.md y volvé a instalar`);
+			problemas.push(`${copia} no coincide con agents/${archivo}: si tenía secciones propias, movelas al AGENTS.md y volvé a instalar`);
 		}
 	}
 

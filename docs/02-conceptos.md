@@ -15,11 +15,11 @@ Los comandos `/opsx:*` de Claude Code recorren el ciclo: `propose` → `apply` �
 
 ## Subagente
 
-Un agente de Claude Code con su propio archivo de instrucciones (`.claude/agents/<nombre>.md`), su modelo y sus herramientas. Arranca **sin el contexto de la conversación principal**: solo sabe lo que le pasa el orquestador y lo que lee por su cuenta. Eso es una ventaja (contexto limpio, independencia) y un costo (relee los artefactos).
+Un agente con su propio archivo de instrucciones, su modelo y sus herramientas. En Claude Code es `.claude/agents/<nombre>.md`, generado desde `roles/` (ver [Portabilidad](10-portabilidad.md)). Arranca **sin el contexto de la conversación principal**: solo sabe lo que le pasa el orquestador y lo que lee por su cuenta. Eso es una ventaja (contexto limpio, independencia) y un costo (relee los artefactos).
 
 ## Orquestador
 
-La sesión principal de Claude Code, la que habla con vos. Reparte las tareas, crea los worktrees, lanza los subagentes, junta su trabajo y te muestra el diff. **No es un agente de este repo:** es tu sesión siguiendo el procedimiento de [Uso](05-uso.md).
+La sesión principal: en Claude Code es la que habla con vos; con el orquestador portable, es el script. Reparte las tareas, crea los worktrees, lanza los subagentes, junta su trabajo y te muestra el diff. **No es un agente de este repo:** es tu sesión siguiendo el procedimiento de [Uso](05-uso.md).
 
 ## Grupo
 

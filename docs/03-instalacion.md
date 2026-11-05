@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- **Claude Code** (CLI, app de escritorio o extensión del IDE).
+- **Claude Code** (CLI, app de escritorio o extensión del IDE), si vas a usar los agentes con Claude. Para otras CLIs, ver [Portabilidad](10-portabilidad.md).
 - **Node.js**, para el hook del tester y el script de verificación.
 - **CLI de OpenSpec** (`openspec`), inicializada en el proyecto (`openspec init`). Además de la CLI, deja en `.claude/` las skills y los comandos `/opsx:*`. El implementador usa la skill `openspec-apply-change` y el revisor `openspec-verify-change`.
 - **git**, para los worktrees.
@@ -56,13 +56,13 @@ Para lo que tiene que estar garantizado, no confíes solo en el hook: quitá las
 
 Supone que los worktrees de cada área ya existen y que la corrección corre sobre el checkout integrado. Los argumentos son `change`, `areas` (cada una con `nombre`, `tareas` y `worktree`), y los opcionales `postgres` y `seguridad`, que decide quien lo lanza según el change.
 
-Ejemplos de los archivos que el proyecto necesita están en [`docs/ejemplos/`](ejemplos/): un `CLAUDE.md`, un `openspec/config.yaml` y un `docs/flujo-de-trabajo.md`.
+Ejemplos de los archivos que el proyecto necesita están en [`docs/ejemplos/`](ejemplos/): un `AGENTS.md` con su `CLAUDE.md` que lo importa, un `openspec/config.yaml` y un `docs/flujo-de-trabajo.md`.
 
 ### Requisitos de archivos del proyecto
 
 Los agentes leen archivos que el repo no trae. Tienen que existir en el proyecto:
 
-- `CLAUDE.md`: reglas del proyecto. El `postgres-pro` las usa como fuente de su stack y su acceso a datos.
+- `AGENTS.md`: reglas del proyecto. El `postgres-pro` las usa como fuente de su stack y su acceso a datos. Un `CLAUDE.md` con la línea `@AGENTS.md` hace que Claude Code las lea también.
 - `openspec/config.yaml`: el campo `context` con la arquitectura y el contrato.
 - `docs/flujo-de-trabajo.md`: el flujo completo de un change, con el paso 10 (apply) y la sección "Al cerrar cada grupo del apply", que el revisor consulta.
 
@@ -125,13 +125,13 @@ Este repo es la fuente de los agentes. Para tomar una versión nueva, hacé `git
 
 ## Variantes por proyecto
 
-Los agentes de este repo son genéricos. Lo que depende de un proyecto (su stack, sus clases base de test, sus reglas de logs y de errores) no va en el archivo del agente: va en el `CLAUDE.md` del proyecto. Los agentes lo leen y, si contradice sus reglas genéricas, gana el `CLAUDE.md`. Así un proyecto no necesita una copia propia de cada agente.
+Los agentes de este repo son genéricos. Lo que depende de un proyecto (su stack, sus clases base de test, sus reglas de logs y de errores) no va en el archivo del agente: va en el `AGENTS.md` del proyecto. Los agentes lo leen y, si contradice sus reglas genéricas, gana el `CLAUDE.md`. Así un proyecto no necesita una copia propia de cada agente.
 
-- **Tester, revisor, security-auditor y postgres-pro** leen el `CLAUDE.md` del proyecto antes de empezar.
+- **Tester, revisor, security-auditor y postgres-pro** leen el `AGENTS.md` del proyecto antes de empezar.
 - **Implementador** lee el `context` de `openspec/config.yaml`, que define la arquitectura y el contrato.
 
 Si un proyecto ya tiene una copia propia de un agente con secciones "El proyecto":
 
-- Movélas al `CLAUDE.md` del proyecto, versionado ahí, y volvé a instalar el agente genérico.
+- Movélas al `AGENTS.md` del proyecto, versionado ahí, y volvé a instalar el agente genérico.
 - **No corras el instalador sobre ese proyecto sin antes mover esas secciones**, o las perdés: el instalador pisa los archivos de `.claude/agents/`.
-- Si este repo cambia una regla genérica, revisá si el `CLAUDE.md` del proyecto la contradice.
+- Si este repo cambia una regla genérica, revisá si el `AGENTS.md` del proyecto la contradice.

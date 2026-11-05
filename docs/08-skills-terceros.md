@@ -14,7 +14,7 @@ Este repo incluye skills de [mattpocock/skills](https://github.com/mattpocock/sk
 | `code-review` | Revisión en dos ejes (Standards y Spec) en subagentes paralelos. | El eje Spec lee el change de OpenSpec, no un issue tracker. |
 | `pr` | Forma del cuerpo de un PR. | Ninguno. |
 | `retro` | Sugerencias para mejorar el entorno de agentes después de una sesión. | Ninguno. |
-| `writing-for-agents` | Cómo escribir skills, `CLAUDE.md` y otros documentos que leen los agentes. | Ninguno. |
+| `writing-for-agents` | Cómo escribir skills, `AGENTS.md` y otros documentos que leen los agentes. | Ninguno. |
 
 ## No incluidas
 
@@ -25,7 +25,7 @@ Estas skills dependen de un issue tracker o de un flujo distinto al de OpenSpec,
 - `to-questionnaire`, `wait-what`, `teach`, `handoff`, `grill-me`: de productividad fuera de código. Se pueden agregar si hacen falta.
 - `prototype`, `research`, `improve-codebase-architecture`, `codebase-design`, `wizard`: útiles, pero no forman parte del ciclo del apply. Se pueden agregar después.
 
-Las carpetas `agents/` de cada skill (metadatos para Codex) no se copiaron, porque este repo es para Claude Code.
+Las carpetas `agents/` de cada skill (metadatos para Codex) no se copiaron: este repo genera los agentes para Claude Code desde `roles/` y no usa esos metadatos.
 
 ## Actualizar
 

@@ -29,8 +29,8 @@ el orquestador con la persona.
 Además de la spec y el design, revisás el código integrado con estos criterios.
 Son complementarios: si un hallazgo contradice la spec, va como bloqueante; si no,
 como importante o menor. Las reglas propias del stack del proyecto (transacciones,
-formato de errores, convenciones) están en su `CLAUDE.md`; si contradicen estos
-criterios, gana el `CLAUDE.md`.
+formato de errores, convenciones) están en su `AGENTS.md`; si contradicen estos
+criterios, gana el `AGENTS.md`.
 
 - **Lógica:** condiciones invertidas o incompletas, casos borde (nulo, vacío, el
   límite y uno más), comparaciones de cadenas y fechas hechas mal, excepciones
@@ -63,7 +63,7 @@ Desde el checkout que te indique el orquestador:
    revisión: un `@DisplayName` que existe puede no verificar su THEN.
 
 Fuentes de verdad, en este orden: specs del change, `design.md`, `tasks.md`,
-`openspec/config.yaml`, `CLAUDE.md` y `docs/flujo-de-trabajo.md` (sección "Al
+`openspec/config.yaml`, `AGENTS.md` y `docs/flujo-de-trabajo.md` (sección "Al
 cerrar cada grupo del apply").
 
 ## Reglas

@@ -27,6 +27,12 @@ jobs:
       - name: Probar el orquestador con una CLI falsa
         run: node --test scripts/test-orquestar.js
 
+      - name: Probar el verificador de enlaces
+        run: node --test scripts/test-verificar-enlaces.js
+
+      - name: Verificar que no haya enlaces rotos en README y docs
+        run: node scripts/verificar-enlaces.js
+
       - name: Validar frontmatter de los agentes
         run: node scripts/validar-agentes.js
 
