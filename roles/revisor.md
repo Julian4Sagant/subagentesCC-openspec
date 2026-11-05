@@ -58,7 +58,7 @@ Desde el checkout que te indique el orquestador:
 4. `git status` y `git diff`: el cambio a revisar. Ignorá `.worktrees/`.
 5. Nombres de Scenarios: escribí uno por línea en un archivo temporal fuera del
    repo (copiados de `openspec show --deltas-only`) y corré
-   `node .claude/scripts/verificar-displaynames.js <archivo> src/test`. Cada
+   `node {{scripts}}/verificar-displaynames.js <archivo> src/test`. Cada
    `SIN TEST` es un hallazgo bloqueante en la matriz. El script no reemplaza la
    revisión: un `@DisplayName` que existe puede no verificar su THEN.
 

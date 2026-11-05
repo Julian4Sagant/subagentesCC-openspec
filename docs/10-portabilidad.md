@@ -22,9 +22,8 @@ Este repo nació para Claude Code. Hoy la mayor parte de su lógica está separa
 | Instalador | `scripts/install.ps1` | Solo PowerShell, y copia a `.claude/`. |
 | Workflow del apply | `workflows/apply-change.js` | Corre en la herramienta `Workflow` de Claude Code. El orquestador portable lo reemplaza. |
 | Skills de OpenSpec | `.claude/skills/openspec-*` | Las instala `openspec init` para Claude. El orquestador busca las skills en el repo integrado. |
-| Rutas en el texto de los roles | `roles/tester.md`, `roles/revisor.md` | Mencionan `.claude/hooks/...` y `.claude/scripts/...`. Son rutas de instalación de Claude, y quedan en el texto de rol. |
 
-Esta última fila es el acoplamiento que queda dentro de la capa neutral: un rol que cite `.claude/` en su texto no es portable tal cual. Está anotado como pendiente.
+Las rutas de instalación no están en el texto de los roles: se escriben como marcadores `{{hooks}}` y `{{scripts}}`. El generador las resuelve a `.claude/hooks` y `.claude/scripts`, y el orquestador usa los valores de `rutas` en `config/cli.json`. La validación de `roles/` rechaza un `.claude/` literal.
 
 ## Contrato del proyecto: `AGENTS.md`
 
@@ -76,8 +75,6 @@ Las suites de pruebas (`scripts/test-*.js`) usan una CLI falsa o comprueban lóg
 
 ## Lo que queda pendiente
 
-- **Instalador multiplataforma.** `install.ps1` solo corre en Windows y solo copia a `.claude/`.
-- **Rutas de instalación fuera de los roles.** Sacar `.claude/hooks/` y `.claude/scripts/` del texto de `roles/tester.md` y `roles/revisor.md`. Hace falta que el orquestador sepa dónde está cada script en cada CLI.
 - **Probar Codex y Gemini CLI** de verdad, con las entradas en `config/cli.json`.
-- **Retirar el workflow de Claude**, si se decide. Es una decisión aparte porque rompe a quien use el runtime `Workflow`.
+- **El workflow de Claude se mantiene** (`workflows/apply-change.js`). Retirarlo rompería a quien use el runtime `Workflow`; se decidió no hacerlo por ahora.
 - **Skills en formato neutral.** Hoy las skills de OpenSpec las instala `openspec init` para Claude. Hay que ver qué instala la CLI de OpenSpec para cada herramienta antes de asumir que existen.

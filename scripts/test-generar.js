@@ -72,10 +72,11 @@ test('las skills se emiten como lista YAML', () => {
 	assert.doesNotMatch(generado('tester'), /\nskills:/);
 });
 
-test('el cuerpo del agente generado es idéntico al de la fuente', () => {
+test('el cuerpo del agente generado es el de la fuente, con las rutas de Claude en lugar de los marcadores', () => {
 	for (const nombre of fs.readdirSync(carpetaRoles).map(f => path.basename(f, '.md'))) {
 		const texto = fs.readFileSync(path.join(carpetaRoles, `${nombre}.md`), 'utf8');
-		const cuerpoFuente = texto.slice(texto.indexOf('\n---\n') + 5);
+		const cuerpoFuente = texto.slice(texto.indexOf('\n---\n') + 5)
+			.replace(/\{\{hooks\}\}/g, '.claude/hooks').replace(/\{\{scripts\}\}/g, '.claude/scripts');
 		const cuerpoGenerado = generado(nombre).slice(generado(nombre).indexOf('\n---\n') + 5);
 		assert.equal(cuerpoGenerado, cuerpoFuente, nombre);
 	}
@@ -99,6 +100,16 @@ test('rechaza una guarda desconocida', () => {
 test('rechaza una capacidad desconocida', () => {
 	const texto = fuente('x', ['nivel: medio', 'herramientas: [leer, volar]', 'guardas: [sin-escritura]']);
 	assert.throws(() => generarDesdeTexto(texto, 'x.md'), /herramientas desconocidas: volar/);
+});
+
+test('rechaza una ruta .claude/ literal en el cuerpo', () => {
+	const texto = fuente('x', BASE, '\nUsá .claude/hooks/x.js\n');
+	assert.throws(() => generarDesdeTexto(texto, 'x.md'), /con un marcador/);
+});
+
+test('sustituye los marcadores de ruta por las de Claude', () => {
+	const texto = fuente('x', BASE, '\nCorré {{scripts}}/a.js y {{hooks}}/b.js\n');
+	assert.match(generarDesdeTexto(texto, 'x.md').contenido, /Corré \.claude\/scripts\/a\.js y \.claude\/hooks\/b\.js/);
 });
 
 test('rechaza un name que no coincide con el archivo', () => {

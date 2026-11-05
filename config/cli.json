@@ -2,14 +2,21 @@
   "claude": {
     "comando": "claude",
     "argv": [
-      "-p", "{prompt}",
-      "--append-system-prompt", "{sistema}",
+      "-p",
+      "{prompt}",
+      "--append-system-prompt",
+      "{sistema}",
       "--no-session-persistence",
-      "--output-format", "text",
-      "--permission-mode", "acceptEdits",
-      "--model", "{modelo}",
-      "--tools", "{herramientas}",
-      "--allowedTools", "{herramientas}"
+      "--output-format",
+      "text",
+      "--permission-mode",
+      "acceptEdits",
+      "--model",
+      "{modelo}",
+      "--tools",
+      "{herramientas}",
+      "--allowedTools",
+      "{herramientas}"
     ],
     "modelos": {
       "fuerte": "opus",
@@ -17,9 +24,22 @@
       "rapido": "haiku"
     },
     "herramientas": {
-      "leer": ["Read", "Grep", "Glob"],
-      "ejecutar": ["Bash"],
-      "escribir": ["Write", "Edit"]
+      "leer": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "ejecutar": [
+        "Bash"
+      ],
+      "escribir": [
+        "Write",
+        "Edit"
+      ]
+    },
+    "rutas": {
+      "hooks": ".claude/hooks",
+      "scripts": ".claude/scripts"
     }
   }
 }

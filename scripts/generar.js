@@ -102,6 +102,9 @@ function validarRol(campos, nombreArchivo, cuerpo, rel) {
 	if (!cuerpo.trim()) {
 		throw new Error(`${rel}: el cuerpo está vacío`);
 	}
+	if (/\.claude\//.test(cuerpo)) {
+		throw new Error(`${rel}: citá la ruta de instalación con un marcador ({{hooks}} o {{scripts}}), no con .claude/ directo`);
+	}
 	const skills = Array.isArray(campos.skills) ? campos.skills : [];
 	const escribe = todas || campos.herramientas.includes('escribir');
 	return {
@@ -132,8 +135,22 @@ function bloqueHooks(rol) {
 	return lineas;
 }
 
+/** Rutas de instalación de Claude Code para los marcadores de las fuentes. */
+const RUTAS_CLAUDE = { hooks: '.claude/hooks', scripts: '.claude/scripts' };
+
+/** Reemplaza {{clave}} por la ruta de la CLI. Falla si un marcador no tiene ruta. */
+function sustituirRutas(cuerpo, rutas, rel) {
+	return cuerpo.replace(/\{\{(\w+)\}\}/g, (_, clave) => {
+		if (!Object.prototype.hasOwnProperty.call(rutas, clave)) {
+			throw new Error(`${rel}: el marcador {{${clave}}} no tiene ruta en la CLI`);
+		}
+		return rutas[clave];
+	});
+}
+
 /** Genera el archivo de agente de Claude Code para un rol validado. */
-function generarAgente(rol, cuerpo) {
+function generarAgente(rol, cuerpoFuente) {
+	const cuerpo = sustituirRutas(cuerpoFuente, RUTAS_CLAUDE, `roles/${rol.nombre}.md`);
 	const lineas = [
 		'---',
 		`# Generado por scripts/generar.js desde roles/${rol.nombre}.md. No editar: cambiá la fuente y volvé a generar.`,

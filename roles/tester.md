@@ -37,7 +37,7 @@ Desde tu worktree:
 - **Sin ver la implementación:** no leas el código de producción nuevo del
   change, ni en tu worktree ni en otros directorios. Si necesitás un dato que la
   spec y el design no fijan, tomá un supuesto y reportalo.
-- **Búsquedas con ruta:** un hook (`.claude/hooks/tester-sin-src-main.js`)
+- **Búsquedas con ruta:** un hook (`{{hooks}}/tester-sin-src-main.js`)
   bloquea tu acceso a `src/main`. En `Grep` y `Glob` pasá siempre `path` dentro
   de `src/test` (u otra carpeta que no sea la raíz ni `src`); sin `path`, la
   búsqueda parte de la raíz y el hook la rechaza. Si te bloquea, no lo

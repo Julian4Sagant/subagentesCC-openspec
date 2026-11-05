@@ -62,6 +62,7 @@ function configFalsa(tmp) {
 			argv: [FALSA, '{prompt}', '{sistema}', '{herramientas}'],
 			modelos: { fuerte: 'f', medio: 'm', rapido: 'r' },
 			herramientas: { leer: ['Read', 'Grep', 'Glob'], ejecutar: ['Bash'], escribir: ['Write', 'Edit'] },
+			rutas: { hooks: '.claude/hooks', scripts: '.claude/scripts' },
 		},
 	}));
 	return archivo;
@@ -129,6 +130,21 @@ test('interpretar lee veredicto, puntos y conteos', () => {
 	assert.equal(r.seguridadOk, false);
 	assert.equal(interpretar('VEREDICTO: APROBADO', null, false).seguridadOk, true);
 });
+
+test('un marcador sin ruta en la CLI hace fallar la corrida antes de correr nada', conTmp(async (tmp) => {
+	const integrado = repoIntegrado(tmp);
+	areaDe(tmp, integrado, 'solicitudes');
+	const cfgSinRutas = path.join(tmp, 'cli-sin-rutas.json');
+	const base = JSON.parse(fs.readFileSync(configFalsa(tmp), 'utf8'));
+	base.falsa.rutas = {};
+	fs.writeFileSync(cfgSinRutas, JSON.stringify(base));
+	const r = await orquestar({
+		change: 'x', integrado, salida: path.join(tmp, 'salida'), cli: 'falsa', config: cfgSinRutas,
+		areas: [{ nombre: 'solicitudes', tareas: '1.1', worktree: path.join(tmp, 'area-solicitudes') }],
+	});
+	assert.equal(r.estado, 'BLOQUEADO');
+	assert.match(r.motivo, /no tiene ruta en la CLI/);
+}));
 
 test('cargarCli falla con un nombre de CLI que no está en la config', conTmp((tmp) => {
 	assert.throws(() => cargarCli(configFalsa(tmp), 'inexistente'), /no hay configuración/);

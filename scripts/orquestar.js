@@ -130,12 +130,22 @@ function cargarCli(archivo, nombre) {
 	if (!cfg) {
 		throw new Error(`no hay configuración para la CLI "${nombre}" en ${archivo}`);
 	}
-	for (const clave of ['comando', 'argv', 'modelos', 'herramientas']) {
+	for (const clave of ['comando', 'argv', 'modelos', 'herramientas', 'rutas']) {
 		if (!cfg[clave]) {
 			throw new Error(`la configuración de "${nombre}" no tiene ${clave}`);
 		}
 	}
 	return cfg;
+}
+
+/** Reemplaza {{clave}} por la ruta de la CLI. Falla si un marcador no tiene ruta. */
+function sustituirRutas(cuerpo, rutas, rel) {
+	return cuerpo.replace(/\{\{(\w+)\}\}/g, (_, clave) => {
+		if (!Object.prototype.hasOwnProperty.call(rutas, clave)) {
+			throw new Bloqueo(`${rel}: el marcador {{${clave}}} no tiene ruta en la CLI`);
+		}
+		return rutas[clave];
+	});
 }
 
 /** Texto de las skills del rol, buscadas en las carpetas configuradas. Falla si falta alguna. */
@@ -164,7 +174,7 @@ async function correrRol(ctx, nombreRol, cwd, tarea, etiqueta) {
 		throw new Bloqueo(`no existe el rol ${nombreRol} en roles/`);
 	}
 	const prompt = [`Rol: ${nombreRol}`, `Change de OpenSpec: ${ctx.change}`, `Tu worktree: ${cwd}`, '', tarea].join('\n');
-	const r = await ejecutarRol(ctx.cfg, rol, { prompt, sistema: rol.cuerpo + skillsDelRol(ctx, rol), cwd });
+	const r = await ejecutarRol(ctx.cfg, rol, { prompt, sistema: sustituirRutas(rol.cuerpo, ctx.cfg.rutas, `roles/${rol.nombre}.md`) + skillsDelRol(ctx, rol), cwd });
 	log(ctx, etiqueta, `${r.texto}\n--- stderr ---\n${r.error || ''}`);
 	if (r.codigo !== 0) {
 		throw new Bloqueo(`${etiqueta}: la CLI salió con código ${r.codigo}${r.error ? `: ${r.error.trim().slice(0, 300)}` : ''}`);
