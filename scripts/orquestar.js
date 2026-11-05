@@ -216,7 +216,7 @@ async function correrEnWorktree(ctx, { clave, nombreRol, cwd, tarea, etiqueta, v
 	if (validar) {
 		validar(cwd);
 	}
-	const nuevo = confirmarDelOrquestador(cwd, `${etiqueta}: ${clave}`);
+	const nuevo = confirmarDelOrquestador(cwd, `${clave}: cambios de ${etiqueta}`);
 	return { nuevo, texto };
 }
 
@@ -272,6 +272,46 @@ function interpretar(textoRevisor, textoSeguridad, seguridad) {
 	};
 }
 
+/** Ids de tarea de un texto como "1.1,1.2". Falla si algo no tiene forma de id. */
+function idsDe(texto) {
+	const ids = (texto ?? '').split(/[,\s]+/).filter(Boolean);
+	for (const id of ids) {
+		if (!/^\d+(\.\d+)*$/.test(id)) {
+			throw new Bloqueo(`"${id}" no es un id de tarea; listá los ids separados por coma, por ejemplo 1.1,1.2`);
+		}
+	}
+	return ids;
+}
+
+/**
+ * Marca como hechas (`- [x]`) las tareas de las áreas y del tester en tasks.md del repo integrado.
+ * Lo hace el orquestador, no los agentes: solo se llama con las pruebas en verde. Las ya marcadas se saltan.
+ */
+function marcarTareas(ctx) {
+	const ids = new Set([...ctx.areas.flatMap(a => idsDe(a.tareas)), ...idsDe(ctx.tareasTester)]);
+	if (ids.size === 0) {
+		return;
+	}
+	const archivo = path.join(ctx.integrado, 'openspec', 'changes', ctx.change, 'tasks.md');
+	if (!fs.existsSync(archivo)) {
+		throw new Bloqueo(`no existe ${archivo}`);
+	}
+	let texto = fs.readFileSync(archivo, 'utf8');
+	for (const id of ids) {
+		const escapado = id.replace(/\./g, '\\.');
+		const hecha = new RegExp(`^\\s*-\\s\\[x\\]\\s+${escapado}\\b`, 'mi');
+		if (hecha.test(texto)) {
+			continue;
+		}
+		const pendiente = new RegExp(`^(\\s*-\\s)\\[ \\](\\s+${escapado}\\b)`, 'm');
+		if (!pendiente.test(texto)) {
+			throw new Bloqueo(`no encuentro la tarea ${id} en tasks.md`);
+		}
+		texto = texto.replace(pendiente, (_, a, b) => `${a}[x]${b}`);
+	}
+	fs.writeFileSync(archivo, texto);
+}
+
 /** Prepara el contexto: config, roles, worktrees, y verifica que todo lo necesario exista antes de correr nada. */
 function preparar(opciones) {
 	const cfg = cargarCli(opciones.config, opciones.cli);
@@ -293,11 +333,19 @@ function preparar(opciones) {
 		seguridad: Boolean(opciones.seguridad),
 		maxVueltas: opciones.maxVueltas ?? 3,
 		comandoTests: opciones.comandoTests ?? './mvnw -B -q test',
+		comandoOpenspec: opciones.openspec ?? 'openspec',
+		tareasTester: opciones.tareasTester ?? '',
 		carpetasSkills: [...(opciones.skills ?? []), path.join(path.resolve(opciones.integrado), '.claude', 'skills'), path.join(raiz, 'skills')],
 		aplicado: {},
 		historial: [],
 	};
 	revision(ctx.integrado);
+	const openspec = spawnSync(ctx.comandoOpenspec, ['--version'], { encoding: 'utf8' });
+	if (openspec.error || openspec.status !== 0) {
+		throw new Bloqueo(`no encuentro la CLI de OpenSpec ("${ctx.comandoOpenspec}"); los roles la usan. Instalala y dejala en el PATH`);
+	}
+	ctx.areas.forEach(a => idsDe(a.tareas));
+	idsDe(ctx.tareasTester);
 	const usados = new Set(['tester', 'revisor', ...areas.map(a => a.rol), ...(ctx.seguridad ? ['security-auditor'] : [])]);
 	for (const nombre of usados) {
 		const rol = roles.get(nombre);
@@ -335,6 +383,9 @@ async function aplicar(ctx) {
 
 	for (let vuelta = 1; vuelta <= ctx.maxVueltas; vuelta++) {
 		const pruebas = correrPruebas(ctx);
+		if (pruebas.ok) {
+			marcarTareas(ctx);
+		}
 		const tareaRevisor = [
 			`Revisá el código integrado del change "${ctx.change}" contra la spec y el design, sobre este worktree.`,
 			`Resultado de las pruebas: ${pruebas.ok ? 'OK' : 'FALLÓ'}`,
@@ -452,6 +503,8 @@ function leerOpciones(argv) {
 		cli: valor('--cli') ?? 'claude',
 		config: path.resolve(valor('--config') ?? path.join(raiz, 'config', 'cli.json')),
 		comandoTests: valor('--comando-tests'),
+		openspec: valor('--openspec'),
+		tareasTester: valor('--tareas-tester'),
 		maxVueltas: valor('--max-vueltas') ? Number(valor('--max-vueltas')) : undefined,
 		seguridad: argv.includes('--seguridad'),
 		skills,
@@ -469,7 +522,7 @@ async function main(argv) {
 	return resultado.estado === 'APROBADO' ? 0 : 1;
 }
 
-module.exports = { orquestar, construirArgv, interpretar, ejecutarCli, ejecutarRol, cargarCli, Bloqueo };
+module.exports = { orquestar, construirArgv, interpretar, ejecutarCli, ejecutarRol, cargarCli, idsDe, marcarTareas, Bloqueo };
 
 if (require.main === module) {
 	main(process.argv.slice(2)).then((code) => {

@@ -8,7 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { orquestar, construirArgv, interpretar, cargarCli } = require('./orquestar');
+const { orquestar, construirArgv, interpretar, cargarCli, idsDe, marcarTareas, Bloqueo } = require('./orquestar');
 
 const FALSA = path.join(__dirname, 'fixtures', 'cli-falso.js');
 const ENTORNO = {
@@ -36,6 +36,7 @@ function repoIntegrado(tmp) {
 	fs.writeFileSync(path.join(repo, 'src/main/Base.txt'), 'base\n');
 	fs.writeFileSync(path.join(repo, 'src/test/Base.txt'), 'base\n');
 	fs.writeFileSync(path.join(repo, 'openspec/changes/x/spec.md'), '# spec\n');
+	fs.writeFileSync(path.join(repo, 'openspec/changes/x/tasks.md'), '## 1. Tareas\n\n- [ ] 1.1 Implementar\n- [ ] 1.2 Tests\n');
 	fs.writeFileSync(path.join(repo, '.gitignore'), 'target/\n');
 	for (const s of SKILLS_OPENSPEC) {
 		fs.mkdirSync(path.join(repo, '.claude/skills', s), { recursive: true });
@@ -69,7 +70,7 @@ function configFalsa(tmp) {
 }
 
 /** Corre el orquestador con la CLI falsa y las variables de entorno dadas. Restaura el entorno al final. */
-async function correr(tmp, { modo = '', seguridad = false, skills = [], maxVueltas, comandoTests = 'node -e "process.exit(0)"', integrado, areas } = {}) {
+async function correr(tmp, { modo = '', seguridad = false, skills = [], maxVueltas, comandoTests = 'node -e "process.exit(0)"', integrado, areas, openspec = process.execPath, tareasTester } = {}) {
 	const salida = path.join(tmp, 'salida');
 	const contadores = path.join(tmp, 'contadores');
 	fs.mkdirSync(contadores, { recursive: true });
@@ -88,6 +89,8 @@ async function correr(tmp, { modo = '', seguridad = false, skills = [], maxVuelt
 			seguridad,
 			skills,
 			maxVueltas,
+			openspec,
+			tareasTester,
 		});
 	}
 	finally {
@@ -139,7 +142,7 @@ test('un marcador sin ruta en la CLI hace fallar la corrida antes de correr nada
 	base.falsa.rutas = {};
 	fs.writeFileSync(cfgSinRutas, JSON.stringify(base));
 	const r = await orquestar({
-		change: 'x', integrado, salida: path.join(tmp, 'salida'), cli: 'falsa', config: cfgSinRutas,
+		change: 'x', integrado, salida: path.join(tmp, 'salida'), cli: 'falsa', config: cfgSinRutas, openspec: process.execPath,
 		areas: [{ nombre: 'solicitudes', tareas: '1.1', worktree: path.join(tmp, 'area-solicitudes') }],
 	});
 	assert.equal(r.estado, 'BLOQUEADO');
@@ -169,6 +172,10 @@ test('apply feliz: el tester y el área escriben, el join aplica, la revisión a
 	const herramientas = fs.readFileSync(path.join(tmp, 'contadores/herramientas-revisor.txt'), 'utf8');
 	assert.doesNotMatch(herramientas, /Write|Edit/);
 	assert.ok(fs.existsSync(path.join(tmp, 'salida/resultado.json')));
+	// El orquestador marcó la tarea del área en tasks.md y dejó la otra sin marcar.
+	const tareas = fs.readFileSync(path.join(integrado, 'openspec/changes/x/tasks.md'), 'utf8');
+	assert.match(tareas, /- \[x\] 1\.1 Implementar/);
+	assert.match(tareas, /- \[ \] 1\.2 Tests/);
 	assert.ok(fs.existsSync(path.join(tmp, 'salida/logs')));
 }));
 
@@ -243,4 +250,42 @@ test('repo que no es git: BLOQUEADO con el motivo, sin lanzar', conTmp(async (tm
 	areaDe(tmp, repoIntegrado(tmp), 'solicitudes');
 	const r = await correr(tmp, { integrado: sinGit });
 	assert.equal(r.estado, 'BLOQUEADO');
+}));
+
+test('idsDe: acepta ids separados por coma o espacio y rechaza otra forma', () => {
+	assert.deepEqual(idsDe('1.1,1.2'), ['1.1', '1.2']);
+	assert.deepEqual(idsDe('2.1 2.4'), ['2.1', '2.4']);
+	assert.deepEqual(idsDe(''), []);
+	assert.throws(() => idsDe('2.1 a 2.4'), Bloqueo);
+});
+
+test('marcarTareas: marca solo el id exacto, se salta las ya marcadas y falla si no existe', conTmp((tmp) => {
+	const repo = path.join(tmp, 'repo');
+	fs.mkdirSync(path.join(repo, 'openspec/changes/x'), { recursive: true });
+	const archivo = path.join(repo, 'openspec/changes/x/tasks.md');
+	fs.writeFileSync(archivo, '- [ ] 1.1 A\n- [ ] 1.10 B\n- [x] 1.2 C\n');
+	const ctx = { integrado: repo, change: 'x', areas: [{ tareas: '1.1,1.2' }], tareasTester: '' };
+	marcarTareas(ctx);
+	assert.equal(fs.readFileSync(archivo, 'utf8'), '- [x] 1.1 A\n- [ ] 1.10 B\n- [x] 1.2 C\n');
+	marcarTareas(ctx);
+	ctx.areas = [{ tareas: '9.9' }];
+	assert.throws(() => marcarTareas(ctx), /no encuentro la tarea 9\.9/);
+}));
+
+test('tareas con forma de rango: BLOQUEADO antes de correr nada', conTmp(async (tmp) => {
+	const integrado = repoIntegrado(tmp);
+	areaDe(tmp, integrado, 'solicitudes');
+	const r = await correr(tmp, { areas: [{ nombre: 'solicitudes', tareas: '1.1 a 1.2', worktree: path.join(tmp, 'area-solicitudes') }] });
+	assert.equal(r.estado, 'BLOQUEADO');
+	assert.match(r.motivo, /no es un id de tarea/);
+	assert.equal(fs.existsSync(path.join(tmp, 'salida/ciego')), false);
+}));
+
+test('sin la CLI de OpenSpec: BLOQUEADO antes de correr nada', conTmp(async (tmp) => {
+	const integrado = repoIntegrado(tmp);
+	areaDe(tmp, integrado, 'solicitudes');
+	const r = await correr(tmp, { openspec: 'openspec-que-no-existe-xyz' });
+	assert.equal(r.estado, 'BLOQUEADO');
+	assert.match(r.motivo, /no encuentro la CLI de OpenSpec/);
+	assert.equal(fs.existsSync(path.join(tmp, 'salida/ciego')), false);
 }));

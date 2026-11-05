@@ -44,6 +44,23 @@ function verificarProyecto(raizProyecto) {
 		problemas.push('openspec/config.yaml no tiene el campo context');
 	}
 
+	// openspec show --json exige estos encabezados en proposal.md, aunque el texto sea en otro idioma.
+	const carpetaCambios = path.join(raizProyecto, 'openspec/changes');
+	if (fs.existsSync(carpetaCambios)) {
+		for (const cambio of fs.readdirSync(carpetaCambios, { withFileTypes: true }).filter(e => e.isDirectory() && e.name !== 'archive')) {
+			const propuesta = path.join(carpetaCambios, cambio.name, 'proposal.md');
+			if (!fs.existsSync(propuesta)) {
+				continue;
+			}
+			const texto = fs.readFileSync(propuesta, 'utf8');
+			for (const encabezado of ['## Why', '## What Changes']) {
+				if (!new RegExp(`^${encabezado}\\s*$`, 'm').test(texto)) {
+					problemas.push(`openspec/changes/${cambio.name}/proposal.md no tiene el encabezado "${encabezado}": openspec show --json lo exige (el texto puede ir en otro idioma)`);
+				}
+			}
+		}
+	}
+
 	const flujo = path.join(raizProyecto, 'docs/flujo-de-trabajo.md');
 	if (!fs.existsSync(flujo)) {
 		problemas.push('falta docs/flujo-de-trabajo.md: el revisor lo consulta');
@@ -58,7 +75,7 @@ function verificarProyecto(raizProyecto) {
 	for (const archivo of fs.readdirSync(carpetaAgentes).filter(a => a.endsWith('.md'))) {
 		const copia = path.join('.claude/agents', archivo);
 		if (!existe(copia)) {
-			problemas.push(`falta el agente ${copia}: instalalo con scripts/install.ps1`);
+			problemas.push(`falta el agente ${copia}: instalalo con node scripts/instalar.js --proyecto <ruta>`);
 			continue;
 		}
 		const fuente = normalizar(fs.readFileSync(path.join(carpetaAgentes, archivo), 'utf8'));

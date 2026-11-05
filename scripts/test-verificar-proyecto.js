@@ -62,6 +62,23 @@ test('CLAUDE.md con @AGENTS.md dentro de un bloque de código no cuenta como imp
 	assert.match(verificarProyecto(raiz).join('\n'), /CLAUDE\.md no importa AGENTS\.md/);
 });
 
+test('un change con encabezados en español no cumple: openspec show --json los exige en inglés', () => {
+	const raiz = crearProyectoValido();
+	fs.mkdirSync(path.join(raiz, 'openspec/changes/mi-cambio'), { recursive: true });
+	fs.writeFileSync(path.join(raiz, 'openspec/changes/mi-cambio/proposal.md'), '## Por qué\n\nTexto.\n\n## Qué cambia\n\nOtro.\n');
+	const problemas = verificarProyecto(raiz);
+	assert.equal(problemas.length, 2, problemas.join('\n'));
+	assert.match(problemas.join('\n'), /"## Why"/);
+	assert.match(problemas.join('\n'), /"## What Changes"/);
+});
+
+test('un change con los encabezados de OpenSpec, con texto en español, cumple', () => {
+	const raiz = crearProyectoValido();
+	fs.mkdirSync(path.join(raiz, 'openspec/changes/mi-cambio'), { recursive: true });
+	fs.writeFileSync(path.join(raiz, 'openspec/changes/mi-cambio/proposal.md'), '## Why\n\nPorque sí.\n\n## What Changes\n\nSe agrega algo.\n');
+	assert.deepEqual(verificarProyecto(raiz), []);
+});
+
 test('config.yaml sin campo context', () => {
 	const raiz = crearProyectoValido();
 	fs.writeFileSync(path.join(raiz, 'openspec/config.yaml'), 'schema: spec-driven\n');

@@ -4,7 +4,7 @@
 
 - **Claude Code** (CLI, app de escritorio o extensión del IDE), si vas a usar los agentes con Claude. Para otras CLIs, ver [Portabilidad](10-portabilidad.md).
 - **Node.js**, para el hook del tester y el script de verificación.
-- **CLI de OpenSpec** (`openspec`), inicializada en el proyecto (`openspec init`). Además de la CLI, deja en `.claude/` las skills y los comandos `/opsx:*`. El implementador usa la skill `openspec-apply-change` y el revisor `openspec-verify-change`.
+- **CLI de OpenSpec** (`openspec`), inicializada en el proyecto (`openspec init`). Además de la CLI, deja en `.claude/` las skills y los comandos `/opsx:*`. El implementador usa la skill `openspec-apply-change` y el revisor `openspec-verify-change`. Esa última solo viene con el perfil `custom` de OpenSpec que incluye `verify`; con el perfil `core`, el default, no está.
 - **git**, para los worktrees.
 - Un proyecto con tests en `src/test` y código en `src/main` (los agentes están pensados para Java con Maven, pero las reglas de rol sirven para otros stacks ajustando las instrucciones).
 

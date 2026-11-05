@@ -21,14 +21,16 @@ node scripts/orquestar.js \
   --seguridad
 ```
 
-`areas.json` lista las áreas que implementan. Cada worktree lo creás antes, desde el HEAD del repo integrado:
+`areas.json` lista las áreas que implementan. Cada worktree lo creás antes, desde el HEAD del repo integrado. En `tareas` van ids explícitos separados por coma; los rangos como "2.1 a 2.4" no se aceptan:
 
 ```json
 [
-  { "nombre": "solicitudes", "tareas": "2.1 a 2.4", "worktree": "/ruta/a/worktree-solicitudes" },
+  { "nombre": "solicitudes", "tareas": "2.1,2.2,2.3,2.4", "worktree": "/ruta/a/worktree-solicitudes" },
   { "nombre": "migraciones", "tareas": "3.1", "worktree": "/ruta/a/worktree-migraciones", "rol": "postgres-pro" }
 ]
 ```
+
+Las tareas las marca el orquestador en `openspec/changes/<change>/tasks.md`, como `- [x]`, en cuanto las pruebas pasan. Los agentes no tocan los checkboxes.
 
 Opciones:
 
@@ -39,11 +41,15 @@ Opciones:
 | `--comando-tests` | `./mvnw -B -q test` | Comando de pruebas, corrido en el repo integrado. |
 | `--seguridad` | desactivado | Agrega el auditor de seguridad a cada revisión. |
 | `--max-vueltas` | `3` | Vueltas de corrección antes de escalar. |
+| `--openspec` | `openspec` | Comando de la CLI de OpenSpec. Se verifica con `--version` antes de correr nada, porque los roles la llaman. |
+| `--tareas-tester` | — | Ids de tareas que son del tester, por ejemplo `1.2`. |
 | `--skills` | — | Carpeta extra donde buscar skills (se puede repetir). |
 
 **La carpeta de salida tiene que quedar fuera de los repos y de los worktrees.** El orquestador confirma los worktrees con `git add -A`; si la salida quedara dentro, se commitearía. Lo valida antes de crear nada.
 
 El resultado va a stdout y a `<salida>/resultado.json`. Los logs de cada rol van a `<salida>/logs/`. Sale con 0 solo si la corrida quedó `APROBADO`.
+
+El worktree ciego queda en `<salida>/ciego`, registrado en el repo integrado. Cuando termines de revisar, eliminalo con `git worktree remove <salida>/ciego`.
 
 ## Cómo se cumplen las garantías
 
@@ -78,6 +84,11 @@ La última fila es la única que depende de la CLI: el orquestador le pasa la li
 - `{modelo}`: el modelo del nivel del rol según `modelos`. Si el nivel no tiene modelo, el flag que lo precede se quita y la CLI usa su default.
 
 **Solo Claude está probado.** La entrada `claude` se probó de punta a punta con la CLI real, en modo headless, con un revisor de solo lectura: `Bash` funciona, `Write` no está disponible y el veredicto llega bien. Para otras CLIs hay que escribir la entrada y probarla antes de usarla: no hay ninguna verificada en este repo.
+
+## Requisitos de OpenSpec
+
+- **Encabezados de `proposal.md`:** `## Why` y `## What Changes`. `openspec show --json` los exige, y el tester y el auditor leen la spec con ese comando. El texto puede ir en otro idioma. `scripts/verificar-proyecto.js` lo comprueba.
+- **Skill del revisor:** `openspec-verify-change` solo se instala con el perfil `custom` de OpenSpec que incluye `verify`. El perfil `core`, que es el default, no la instala, y el revisor no puede correr sin ella.
 
 ## Pruebas
 
