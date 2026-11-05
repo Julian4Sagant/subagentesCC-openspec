@@ -24,6 +24,9 @@ jobs:
       - name: Probar las garantías de solo lectura y del worktree ciego
         run: node --test scripts/test-garantias.js
 
+      - name: Probar el orquestador con una CLI falsa
+        run: node --test scripts/test-orquestar.js
+
       - name: Validar frontmatter de los agentes
         run: node scripts/validar-agentes.js
 

@@ -212,7 +212,17 @@ function main(argv) {
 	return 0;
 }
 
-module.exports = { generarDesdeTexto, generarTodo, desvios, NIVELES, HERRAMIENTAS };
+/** Lee y valida todas las fuentes de roles/. Devuelve el rol normalizado más su cuerpo. */
+function leerRoles(carpetaRoles) {
+	return fs.readdirSync(carpetaRoles).filter(f => f.endsWith('.md')).sort().map((archivo) => {
+		const rel = `roles/${archivo}`;
+		const texto = fs.readFileSync(path.join(carpetaRoles, archivo), 'utf8').replace(/\r\n/g, '\n');
+		const { fm, cuerpo } = partir(texto, rel);
+		return { ...validarRol(leerCampos(fm, rel), archivo, cuerpo, rel), cuerpo };
+	});
+}
+
+module.exports = { generarDesdeTexto, generarTodo, desvios, leerRoles, NIVELES, HERRAMIENTAS };
 
 if (require.main === module) {
 	process.exitCode = main(process.argv.slice(2));

@@ -32,6 +32,7 @@ Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-ins
 - [Uso](docs/05-uso.md)
 - [Casos de uso](docs/06-casos-de-uso.md)
 - [Patrones](docs/07-patrones.md): el contrato de cada proyecto y las reglas que todos los agentes asumen
+- [Orquestador](docs/09-orquestador.md): corre el apply con los roles y cualquier CLI de agentes configurable
 
 ## Contenido del repo
 
@@ -39,7 +40,8 @@ Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-ins
 roles/      la fuente de cada agente, neutral respecto del modelo y de la herramienta (se edita esto)
 agents/     los cinco agentes para Claude Code, generados desde roles/ con scripts/generar.js (no editar a mano)
 hooks/      hook del tester que bloquea src/main, y guarda de escritura para git y el proyecto
-workflows/  el grafo del apply como script de la herramienta Workflow
+workflows/  el grafo del apply como script de la herramienta Workflow de Claude Code (el orquestador portable está en scripts/orquestar.js)
+config/     configuración de las CLIs de agentes para el orquestador
 skills/     skills que precargan los agentes, como el checklist OWASP del security-auditor
 scripts/    instalador, verificador de @DisplayName, verificador de contrato de proyecto, validadores de agentes y workflows, y pruebas
 docs/       documentación, y ejemplos de los archivos del proyecto en docs/ejemplos/

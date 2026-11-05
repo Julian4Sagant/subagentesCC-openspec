@@ -1,0 +1,25 @@
+{
+  "claude": {
+    "comando": "claude",
+    "argv": [
+      "-p", "{prompt}",
+      "--append-system-prompt", "{sistema}",
+      "--no-session-persistence",
+      "--output-format", "text",
+      "--permission-mode", "acceptEdits",
+      "--model", "{modelo}",
+      "--tools", "{herramientas}",
+      "--allowedTools", "{herramientas}"
+    ],
+    "modelos": {
+      "fuerte": "opus",
+      "medio": "sonnet",
+      "rapido": "haiku"
+    },
+    "herramientas": {
+      "leer": ["Read", "Grep", "Glob"],
+      "ejecutar": ["Bash"],
+      "escribir": ["Write", "Edit"]
+    }
+  }
+}

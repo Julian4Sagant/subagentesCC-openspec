@@ -86,7 +86,7 @@ Los hooks filtran el texto de un comando, así que solo protegen dentro de Claud
 
 El hook `sin-escritura.js` también bloquea `git sparse-checkout` y `git worktree`, para que un agente no pueda materializar `src/main` desde su propio worktree.
 
-Hoy estos comandos los llama el orquestador a mano. El driver de la fase 3 los va a correr solo después de cada rol.
+`scripts/orquestar.js` los corre solo después de cada rol. Ver [Orquestador](09-orquestador.md).
 
 ## Límites
 
