@@ -45,7 +45,7 @@ El contrato del proyecto (stack, reglas, arquitectura) vive en `AGENTS.md`. `CLA
 
 | CLI | Estado | Qué está probado |
 |---|---|---|
-| Claude Code | Probada | Corrida completa del orquestador sobre un proyecto de prueba con OpenSpec 1.16.0 real: tester en worktree ciego, implementador en su área, join, pruebas, revisor de solo lectura y veredicto `APROBADO` en la primera vuelta. Se usó `haiku` en todos los niveles para la prueba; la configuración de producción no se corrió. El import de `CLAUDE.md` funciona: probado con un archivo de otro nombre. |
+| Claude Code | Probada | Corrida completa del orquestador sobre un proyecto de prueba con OpenSpec 1.16.0 real: tester en worktree ciego, implementador en su área, join, pruebas, revisor de solo lectura y veredicto `APROBADO` en la primera vuelta. Para la prueba se usó el modelo más económico en todos los niveles; la configuración de producción no se corrió. El import de `CLAUDE.md` funciona: probado con un archivo de otro nombre. |
 | Codex CLI | Sin probar | No está instalada en el entorno donde se desarrolló esto. La entrada no existe en `config/cli.json`. |
 | Gemini CLI | Sin probar | Igual que Codex. |
 | Otras | Sin probar | Se agregan con el procedimiento de abajo. |
