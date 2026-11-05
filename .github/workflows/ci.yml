@@ -15,6 +15,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Verificar que agents/ sale de roles/
+        run: node scripts/generar.js --verificar
+
+      - name: Probar el generador de agentes
+        run: node --test scripts/test-generar.js
+
       - name: Validar frontmatter de los agentes
         run: node scripts/validar-agentes.js
 

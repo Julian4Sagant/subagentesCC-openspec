@@ -1,8 +1,9 @@
 ---
+# Generado por scripts/generar.js desde roles/tester.md. No editar: cambiá la fuente y volvé a generar.
 name: tester
 description: Escribe los tests de los Scenarios de un change de OpenSpec a partir de la spec, sin ver la implementación, en el worktree que le asigna el orquestador. Usa la CLI de OpenSpec para tomar el contexto y los nombres exactos de los Scenarios. Usar en el grafo de agentes del apply, en paralelo con los implementadores.
 model: haiku
-tools: Read, Write, Edit, Bash, Grep, Glob
+tools: Read, Grep, Glob, Bash, Write, Edit
 hooks:
   PreToolUse:
     - matcher: "Read|Grep|Glob|Bash"

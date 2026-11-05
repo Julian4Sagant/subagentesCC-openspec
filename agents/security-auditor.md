@@ -1,4 +1,5 @@
 ---
+# Generado por scripts/generar.js desde roles/security-auditor.md. No editar: cambiá la fuente y volvé a generar.
 name: security-auditor
 description: Audita en modo solo lectura los cambios de un change de OpenSpec que tocan autenticación, tokens, permisos por rol, manejo de errores o secretos. Busca vulnerabilidades y las reporta con evidencia y severidad. Usar en el grafo de agentes después del join, junto al revisor, solo cuando el change toca esas áreas.
 model: opus

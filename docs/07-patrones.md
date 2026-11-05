@@ -53,18 +53,22 @@ El orquestador lee esa última línea para decidir si vuelve al agente de cada �
 
 ## 5. Cómo agregar o cambiar un agente
 
-1. Frontmatter completo: `name` igual al nombre del archivo, `description`, `model` (`haiku`, `sonnet` u `opus`) y `tools` o `hooks` según el rol.
-2. Un agente de solo lectura lleva `sin-escritura.js --solo-lectura` y **no** puede tener `Write`, `Edit` ni `NotebookEdit`.
-3. Un agente de escritura lleva `sin-escritura.js` sin `--solo-lectura`.
+La fuente de cada agente es `roles/<nombre>.md`. `agents/` se genera desde ahí y no se edita a mano.
+
+1. Frontmatter neutral: `name` igual al nombre del archivo, `description`, `nivel` (`fuerte`, `medio` o `rapido`), `herramientas` (`todas` o una lista de `leer`, `ejecutar`, `escribir`), `guardas` y `skills`. El nivel no nombra un modelo: la traducción a alias de modelo la hace el generador.
+2. Un rol sin `escribir` en `herramientas` es de solo lectura: el generador le pone `sin-escritura.js --solo-lectura` y no le da herramientas de escritura.
+3. Un rol que escribe lleva `sin-escritura` en `guardas` (sin `--solo-lectura`). Todo rol debe llevarla: el generador rechaza la fuente si falta.
 4. Reporte con formato fijo, igual que los demás.
-5. Agregalo a la tabla de [README](../README.md) y a [Agentes](04-agentes.md).
-6. Corré las validaciones (abajo). CI las corre en cada PR.
+5. Corré `node scripts/generar.js` para regenerar `agents/`. Agregalo a la tabla de [README](../README.md) y a [Agentes](04-agentes.md).
+6. Corré las validaciones (abajo). CI verifica que `agents/` coincida con `roles/` y corre las pruebas del generador en cada PR.
 
 ## 6. Qué se verifica y dónde
 
 | Comando | Qué comprueba |
 |---|---|
-| `node scripts/validar-agentes.js` | Frontmatter, guardas, modelos y rutas de hooks y skills. |
+| `node scripts/generar.js --verificar` | Que `agents/` coincide con `roles/` (sale con 1 si alguien lo editó a mano). |
+| `node --test scripts/test-generar.js` | Que la fuente neutral se traduce bien y que las fuentes inválidas se rechazan. |
+| `node scripts/validar-agentes.js` | Frontmatter, guardas, modelos y rutas de hooks y skills de los agentes generados. |
 | `node --test scripts/test-hooks.js` | Que los hooks bloquean lo que tienen que bloquear. |
 | `node --test scripts/test-verificar-proyecto.js` | Que el contrato de proyecto detecta lo que falta o se desvió. |
 | `node scripts/validar-workflows.js` | Que el workflow del apply parsea y declara su `meta`. |

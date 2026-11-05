@@ -1,4 +1,5 @@
 ---
+# Generado por scripts/generar.js desde roles/implementador.md. No editar: cambiá la fuente y volvé a generar.
 name: implementador
 description: Implementa las tareas de un change de OpenSpec aprobado que le asigna el orquestador, siguiendo la skill openspec-apply-change acotada a esas tareas y en su propio worktree. Usar en el grafo de agentes del apply, una instancia por área de código que no se pisa con las otras.
 model: sonnet

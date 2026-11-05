@@ -36,7 +36,8 @@ Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-ins
 ## Contenido del repo
 
 ```
-agents/     los cinco agentes (fuente de verdad)
+roles/      la fuente de cada agente, neutral respecto del modelo y de la herramienta (se edita esto)
+agents/     los cinco agentes para Claude Code, generados desde roles/ con scripts/generar.js (no editar a mano)
 hooks/      hook del tester que bloquea src/main, y guarda de escritura para git y el proyecto
 workflows/  el grafo del apply como script de la herramienta Workflow
 skills/     skills que precargan los agentes, como el checklist OWASP del security-auditor
