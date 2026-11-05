@@ -74,6 +74,22 @@ La fuente de cada agente es `roles/<nombre>.md`. `agents/` se genera desde ahí 
 | `node scripts/validar-workflows.js` | Que el workflow del apply parsea y declara su `meta`. |
 | `node scripts/verificar-proyecto.js <ruta>` | Que un proyecto concreto cumple el contrato (paso 2). |
 
+## 7. Garantías que no dependen de la herramienta
+
+Los hooks filtran el texto de un comando, así que solo protegen dentro de Claude Code. Para que las garantías valgan con cualquier CLI, `scripts/garantias.js` las comprueba sobre lo que cambió de verdad en el repo y en el disco:
+
+| Garantía | Cómo se comprueba | Comando |
+|---|---|---|
+| El revisor y el auditor no cambian nada | Se toma una foto antes (HEAD, rama, stash y hash de cada archivo tocado, incluido lo que ya estaba sin commitear) y se compara después. Lo ignorado por git, como `target/`, no cuenta. | `snapshot`, después `solo-lectura` |
+| El tester no ve `src/main` | Se crea un worktree con `src/main` excluido por sparse-checkout. Git no lo escribe en disco. Después se verifica que no haya aparecido. | `ciego`, después `verificar-ciego` |
+| Ningún agente commitea | Un commit mueve HEAD y lo detecta la comparación de solo lectura. Sirve también para los roles que escriben: la foto antes y la comparación de HEAD al final muestran si hubo commit. | `snapshot` y `solo-lectura` |
+
+El hook `sin-escritura.js` también bloquea `git sparse-checkout` y `git worktree`, para que un agente no pueda materializar `src/main` desde su propio worktree.
+
+Hoy estos comandos los llama el orquestador a mano. El driver de la fase 3 los va a correr solo después de cada rol.
+
 ## Límites
 
 Las guardas son una barrera contra errores, no un límite de seguridad. Lo que tiene que estar garantizado se garantiza quitando herramientas (un agente sin `Write` no puede escribir), no con un hook. Ver [Instalación, límites de las guardas](03-instalacion.md#límites-de-las-guardas).
+
+Las comprobaciones de esta sección son posteriores: detectan el cambio pero no lo evitan. `verificar-ciego` revisa dos cosas: que la ruta excluida no exista en disco, y que ningún enlace simbólico del worktree apunte fuera de él. Lo que no cubre: un enlace que el tester cree y después se borra antes de la verificación, o un proceso que lea el código excluido sin escribirlo en el worktree.

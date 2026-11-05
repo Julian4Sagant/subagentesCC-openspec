@@ -23,7 +23,7 @@ function leerEntrada() {
 	}
 }
 
-const GIT_QUE_CAMBIA = /\bgit\s+(commit|push|reset|stash|checkout|switch|merge|rebase|add|tag|restore|clean|rm|mv|cherry-pick|revert|am|apply|pull)\b/;
+const GIT_QUE_CAMBIA = /\bgit\s+(commit|push|reset|stash|checkout|switch|merge|rebase|add|tag|restore|clean|rm|mv|cherry-pick|revert|am|apply|pull|sparse-checkout|worktree)\b/;
 const COMANDOS_QUE_ESCRIBEN = /(^|[;&|(\s])(tee|cp|mv|rm|mkdir|touch|chmod|chown)\b|\bsed\s+-i/;
 const REDIRECCION = /(^|[^0-9&])>{1,2}\s*("[^"]*"|'[^']*'|[^\s;&|)]+)/g;
 

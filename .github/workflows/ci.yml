@@ -21,6 +21,9 @@ jobs:
       - name: Probar el generador de agentes
         run: node --test scripts/test-generar.js
 
+      - name: Probar las garantías de solo lectura y del worktree ciego
+        run: node --test scripts/test-garantias.js
+
       - name: Validar frontmatter de los agentes
         run: node scripts/validar-agentes.js
 

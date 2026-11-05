@@ -43,6 +43,8 @@ test('sin-escritura: bloquea git que cambia el repo', () => {
 	assert.equal(decidir('sin-escritura.js', [], bash('git commit -m x')), 'deny');
 	assert.equal(decidir('sin-escritura.js', [], bash('git push origin main')), 'deny');
 	assert.equal(decidir('sin-escritura.js', [], bash('git reset --hard')), 'deny');
+	assert.equal(decidir('sin-escritura.js', [], bash('git sparse-checkout disable')), 'deny');
+	assert.equal(decidir('sin-escritura.js', [], bash('git worktree add ../x')), 'deny');
 });
 
 test('sin-escritura: deja git de solo lectura y comandos normales', () => {
