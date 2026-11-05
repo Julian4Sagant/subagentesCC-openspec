@@ -8,17 +8,19 @@ La idea central: **los tests verifican el contrato, no la implementación.** Si 
 |---|---|---|---|
 | `implementador` | Implementa las tareas de su área en su propio worktree. | sonnet | Escritura |
 | `tester` | Escribe los tests de los Scenarios desde la spec, sin ver `src/main`. | haiku | Escritura en `src/test` |
-| `revisor` | Revisa lo integrado contra spec y design y da un veredicto. | sonnet | Solo lectura |
+| `revisor` | Revisa lo integrado contra spec y design y da un veredicto. | opus | Solo lectura |
 | `security-auditor` | Audita cambios en autenticación, permisos, errores, logs o secretos. | opus | Solo lectura |
 | `postgres-pro` | Diseña y revisa migraciones, constraints y consultas de PostgreSQL. | sonnet | Escritura |
 
 ## Instalación rápida
 
-Desde PowerShell, dentro de la carpeta de este repo:
+Desde la carpeta de este repo, en cualquier sistema operativo:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Proyecto C:\ruta\al\proyecto
+```bash
+node scripts/instalar.js --proyecto /ruta/al/proyecto
 ```
+
+En Windows también sirve `scripts\install.ps1`.
 
 Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-instalacion.md). Para otras CLIs de agentes, ver [Orquestador](docs/09-orquestador.md) y [Portabilidad](docs/10-portabilidad.md).
 

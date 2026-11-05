@@ -2,7 +2,7 @@
 # Generado por scripts/generar.js desde roles/revisor.md. No editar: cambiá la fuente y volvé a generar.
 name: revisor
 description: Revisa en modo solo lectura el código integrado de un grupo de tareas contra la spec y el design de un change de OpenSpec, sin el contexto de quienes lo implementaron, y verifica con la CLI de OpenSpec que las tareas marcadas estén cumplidas y que el change valide. Usar en el grafo de agentes después del join, antes de mostrarle el diff a la persona.
-model: sonnet
+model: opus
 tools: Read, Grep, Glob, Bash
 skills:
   - openspec-verify-change

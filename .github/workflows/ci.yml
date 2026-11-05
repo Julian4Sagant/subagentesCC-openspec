@@ -30,6 +30,9 @@ jobs:
       - name: Probar el verificador de enlaces
         run: node --test scripts/test-verificar-enlaces.js
 
+      - name: Probar el instalador multiplataforma
+        run: node --test scripts/test-instalar.js
+
       - name: Verificar que no haya enlaces rotos en README y docs
         run: node scripts/verificar-enlaces.js
 

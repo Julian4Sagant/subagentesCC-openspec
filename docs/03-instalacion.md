@@ -10,7 +10,13 @@
 
 ## Instalar en un proyecto
 
-Desde PowerShell, dentro de la carpeta de este repo:
+Desde la carpeta de este repo, en Linux, macOS o Windows, con Node.js 22 o superior:
+
+```bash
+node scripts/instalar.js --proyecto /ruta/al/proyecto
+```
+
+En Windows también existe el instalador de PowerShell, que hace lo mismo:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Proyecto C:\ruta\al\proyecto

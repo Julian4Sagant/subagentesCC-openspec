@@ -6,7 +6,7 @@ Cada ficha resume el archivo de [`agents/`](../agents). Si algo de acá no coinc
 |---|---|---|---|
 | [implementador](#implementador) | sonnet | Sí, en su área | Siempre, uno por área |
 | [tester](#tester) | haiku | Sí, solo `src/test` | Siempre, en paralelo con los implementadores |
-| [revisor](#revisor) | sonnet | No | Siempre, después del join |
+| [revisor](#revisor) | opus | No | Siempre, después del join |
 | [security-auditor](#security-auditor) | opus | No | Si el grupo toca autenticación, permisos, errores, logs o secretos |
 | [postgres-pro](#postgres-pro) | sonnet | Sí, migraciones y acceso a datos | Si el grupo toca tablas, índices, constraints o consultas |
 
@@ -74,7 +74,7 @@ AMBIGUEDADES:
 
 **Rol:** revisor independiente. Revisa el código integrado contra la spec y el design, sin conocer el razonamiento de quienes lo implementaron.
 
-- **Modelo y herramientas:** `sonnet`; `Read`, `Grep`, `Glob`, `Bash`. Precarga la skill `openspec-verify-change`. Solo lectura, con la guarda `sin-escritura.js --solo-lectura`: no puede escribir archivos en el proyecto ni hacer git que cambie el repo.
+- **Modelo y herramientas:** `opus`; `Read`, `Grep`, `Glob`, `Bash`. Precarga la skill `openspec-verify-change`. Solo lectura, con la guarda `sin-escritura.js --solo-lectura`: no puede escribir archivos en el proyecto ni hacer git que cambie el repo.
 - **Recibe:** el change-id, el checkout integrado y el número de grupo.
 - **Hace:** corre `openspec validate --strict`, lee el diff, corre `verificar-displaynames.js`, arma la matriz **Scenario → test → código**, y revisa lógica, errores, rendimiento, duplicación y fugas en logs.
 - **No hace:** editar archivos ni hacer operaciones de git que escriben. Puede correr tests.

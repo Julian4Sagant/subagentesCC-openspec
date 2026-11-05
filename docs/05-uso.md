@@ -75,7 +75,7 @@ Después del último grupo y antes de `/opsx:archive`, pedí `/opsx:verify`: el 
 ## Costo
 
 - Cada subagente arranca sin contexto y relee los artefactos. Usá el grafo cuando el paralelismo y la independencia ahorran más de lo que cuestan.
-- Modelos: `haiku` para el tester, `sonnet` para el implementador, el revisor y el postgres-pro, `opus` para el security-auditor.
+- Modelos: `haiku` para el tester, `sonnet` para el implementador y el postgres-pro, `opus` para el revisor y el security-auditor.
 - Como máximo un implementador por área y unos cinco agentes en paralelo por grupo.
 - Un revisor por grupo y una sola verificación final por change.
 - La suite completa corre una vez en el join, no cada agente por su cuenta, para que los logs de Maven no llenen el contexto del orquestador.

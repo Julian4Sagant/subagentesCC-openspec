@@ -1,7 +1,7 @@
 ---
 name: revisor
 description: Revisa en modo solo lectura el código integrado de un grupo de tareas contra la spec y el design de un change de OpenSpec, sin el contexto de quienes lo implementaron, y verifica con la CLI de OpenSpec que las tareas marcadas estén cumplidas y que el change valide. Usar en el grafo de agentes después del join, antes de mostrarle el diff a la persona.
-nivel: medio
+nivel: fuerte
 herramientas: [leer, ejecutar]
 guardas: [sin-escritura]
 skills: [openspec-verify-change]
