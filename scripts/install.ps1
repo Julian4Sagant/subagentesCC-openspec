@@ -11,12 +11,13 @@ if (-not (Test-Path $Proyecto -PathType Container)) {
 
 $raiz = Split-Path -Parent $PSScriptRoot
 $destino = Join-Path $Proyecto '.claude'
-New-Item -ItemType Directory -Force -Path (Join-Path $destino 'agents'), (Join-Path $destino 'hooks'), (Join-Path $destino 'scripts'), (Join-Path $destino 'workflows'), (Join-Path $destino 'skills') | Out-Null
+New-Item -ItemType Directory -Force -Path (Join-Path $destino 'agents'), (Join-Path $destino 'commands'), (Join-Path $destino 'hooks'), (Join-Path $destino 'scripts'), (Join-Path $destino 'workflows'), (Join-Path $destino 'skills') | Out-Null
 
 Copy-Item (Join-Path $raiz 'agents\*.md') (Join-Path $destino 'agents') -Force
+Copy-Item (Join-Path $raiz 'commands\*.md') (Join-Path $destino 'commands') -Force
 Copy-Item (Join-Path $raiz 'hooks\*.js') (Join-Path $destino 'hooks') -Force
 Copy-Item (Join-Path $raiz 'scripts\verificar-displaynames.js') (Join-Path $destino 'scripts') -Force
 Copy-Item (Join-Path $raiz 'workflows\*.js') (Join-Path $destino 'workflows') -Force
 Copy-Item (Join-Path $raiz 'skills\*') (Join-Path $destino 'skills') -Recurse -Force
 
-Write-Host "Agentes, hooks, scripts, workflows y skills instalados en $destino"
+Write-Host "Agentes, comandos, hooks, scripts, workflows y skills instalados en $destino"
