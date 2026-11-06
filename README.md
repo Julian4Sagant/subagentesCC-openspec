@@ -37,6 +37,7 @@ Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-ins
 
 ```
 agents/     los cinco agentes (fuente de verdad)
+commands/   comandos del proyecto: /apply-grupo (un grupo del apply) y /verificar-change (verificación final)
 hooks/      hook del tester que bloquea src/main, y guarda de escritura para git y el proyecto
 workflows/  el grafo del apply como script de la herramienta Workflow
 skills/     skills que precargan los agentes, como el checklist OWASP del security-auditor

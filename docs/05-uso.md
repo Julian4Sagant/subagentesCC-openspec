@@ -31,9 +31,21 @@ Cómo ejecutar el apply de un grupo con el grafo. El orquestador es tu sesión p
 - **Máximo 3 iteraciones por grupo.** Si no se aprueba en tres vueltas, el orquestador te entrega el último veredicto y el historial de hallazgos, y decidís vos.
 - **Cada iteración queda registrada:** el orquestador le pasa al revisor `Iteración: n de 3`.
 
+## Comando de grupo
+
+Con el repo instalado, el grupo se lanza con el comando del proyecto:
+
+```text
+/apply-grupo <change-id> <grupo>
+```
+
+Por ejemplo, `/apply-grupo agregar-validaciones 2`. El comando (`.claude/commands/apply-grupo.md`) lee las tareas del grupo de `tasks.md` y sigue los pasos de esta página. Es autocontenido: no necesita que el proyecto tenga este repo a mano.
+
+El comando no ejecuta `/opsx:apply`. La skill `openspec-apply-change` la carga cada `implementador` según su frontmatter. Vos seguís siendo el orquestador.
+
 ## Prompt de sesión de grupo
 
-Copiá y completá:
+Si no querés usar el comando, copiá y completá este prompt:
 
 ```text
 Apply del change <change-id>, grupo <n>, con el grafo de agentes.
@@ -70,7 +82,7 @@ Sale con 0 si todos tienen test, 1 si falta alguno (y lista los `SIN TEST`), 2 s
 
 ## Verificación final
 
-Después del último grupo y antes de `/opsx:archive`, pedí `/opsx:verify`: el revisor revisa el change completo con la skill `openspec-verify-change` y devuelve su reporte (CRITICAL, WARNING, SUGGESTION) junto con el veredicto.
+Después del último grupo y antes de `/opsx:archive`, corré `/verificar-change <change-id>`: el revisor revisa el change completo con la skill `openspec-verify-change` y devuelve su reporte (CRITICAL, WARNING, SUGGESTION) junto con el veredicto.
 
 ## Costo
 
