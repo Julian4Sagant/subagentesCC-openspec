@@ -6,7 +6,7 @@ Apply del change $1, grupo $2, con el grafo de agentes. Sos el orquestador: repa
 
 Antes de empezar:
 - Verificá que estás en la rama `change/$1` con el árbol limpio. Si no, paráte y avisame.
-- Leé las tareas del grupo $2 en `openspec/changes/$1/tasks.md`. Si el grupo no existe, paráte y avisame.
+- Leé `openspec/changes/$1/tasks.md` y tomá solo las tareas bajo el encabezado que empieza con `## Grupo $2` (por ejemplo `## Grupo $2: ...`). No tomes tareas de otros grupos. Si ese encabezado no existe, paráte y avisame.
 
 Pasos:
 1. **Repartir.** Agrupá las tareas del grupo por área de código, de modo que dos implementadores no toquen el mismo archivo. Los Scenarios de los requirements del grupo van todos al tester.
