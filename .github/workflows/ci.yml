@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, rewrite/agnostico]
 
 jobs:
   agentes:
@@ -15,14 +15,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validar frontmatter de los agentes
+      - name: Validar la fuente canónica
         run: node scripts/validar-agentes.js
 
-      - name: Probar los hooks
-        run: node --test scripts/test-hooks.js
+      - name: Probar scripts
+        run: node --test scripts/test/*.test.js
 
-      - name: Probar el verificador de contrato de proyecto
-        run: node --test scripts/test-verificar-proyecto.js
-
-      - name: Revisar los workflows
-        run: node scripts/validar-workflows.js
+      - name: Verificar que dist/ está al día con agents/
+        run: node scripts/generar-adaptadores.js --check

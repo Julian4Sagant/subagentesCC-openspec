@@ -1,48 +1,52 @@
 # Subagentes OpenSpec
 
-Cinco subagentes de Claude Code que se reparten el apply de un change de OpenSpec: uno implementa, otro escribe los tests desde la spec sin ver el código, otro revisa, y dos especialistas entran cuando hacen falta.
+Cuatro roles de subagente para el ciclo apply/verify de un change de [OpenSpec](https://github.com/Fission-AI/OpenSpec), escritos una sola vez y adaptados a varios asistentes.
 
-La idea central: **los tests verifican el contrato, no la implementación.** Si el mismo agente escribe el código y los tests, tiende a ajustar los tests hasta que pasan. Separando los roles, un test puede fallar de verdad cuando el código se desvía de la spec. Más en [Por qué un grafo](docs/01-por-que-un-grafo.md).
+La idea central: **los tests verifican el contrato, no la implementación.** Un agente escribe el código, otro escribe los tests desde la spec sin leer el código, otro revisa lo integrado y, si el cambio toca áreas sensibles, entra un auditor de seguridad. Así un test puede fallar de verdad cuando el código se aparta de la spec.
 
-| Subagente | Rol | Modelo | Modo |
-|---|---|---|---|
-| `implementador` | Implementa las tareas de su área en su propio worktree. | sonnet | Escritura |
-| `tester` | Escribe los tests de los Scenarios desde la spec, sin ver `src/main`. | haiku | Escritura en `src/test` |
-| `revisor` | Revisa lo integrado contra spec y design y da un veredicto. | sonnet | Solo lectura |
-| `security-auditor` | Audita cambios en autenticación, permisos, errores, logs o secretos. | opus | Solo lectura |
-| `postgres-pro` | Diseña y revisa migraciones, constraints y consultas de PostgreSQL. | sonnet | Escritura |
+| Rol | Acceso | Qué hace |
+|---|---|---|
+| `implementador` | escritura | Implementa sus tareas en un alcance declarado |
+| `tester` | escritura en tests | Escribe un test por Scenario, sin leer `src/main` |
+| `revisor` | lectura | Contrasta lo integrado con la spec y da un veredicto |
+| `security-auditor` | lectura | Revisa autenticación, permisos, logs y secretos |
 
-## Instalación rápida
+Los roles no nombran modelo ni host. Quien usa el repo elige el modelo en su asistente.
 
-Desde PowerShell, dentro de la carpeta de este repo:
+## Hosts
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Proyecto C:\ruta\al\proyecto
+| Host | Cómo se usa | Estado |
+|---|---|---|
+| Claude Code | subagentes nativos | Formato del repo anterior; sin probar en esta versión |
+| OpenCode | subagentes nativos | Parcial |
+| Gemini CLI | subagentes nativos | Parcial |
+| Codex | `AGENTS.md` y prompts | Sin verificar el formato de subagentes |
+| Kimi | `AGENTS.md` y prompts | Sin verificar el formato de subagentes |
+| DeepSeek | prompts | Sin soporte de subagentes documentado |
+
+Detalle en [docs/02-hosts.md](docs/02-hosts.md).
+
+## Empezar
+
+```bash
+node scripts/instalar.js /ruta/al/proyecto
 ```
 
-Requisitos, verificación y variantes por proyecto en [Instalación](docs/03-instalacion.md).
+Después, el flujo del change y cómo leer los reportes están en [docs/03-uso.md](docs/03-uso.md). El diseño y lo que se tomó de otros repos, en [docs/01-diseno.md](docs/01-diseno.md).
 
-## Documentación
-
-- [Índice y por dónde empezar](docs/README.md)
-- [Por qué un grafo de agentes y no uno solo](docs/01-por-que-un-grafo.md)
-- [Conceptos](docs/02-conceptos.md)
-- [Instalación](docs/03-instalacion.md)
-- [Agentes](docs/04-agentes.md)
-- [Uso](docs/05-uso.md)
-- [Casos de uso](docs/06-casos-de-uso.md)
-- [Patrones](docs/07-patrones.md): el contrato de cada proyecto y las reglas que todos los agentes asumen
-
-## Contenido del repo
+## Estructura
 
 ```
-agents/     los cinco agentes (fuente de verdad)
-hooks/      hook del tester que bloquea src/main, y guarda de escritura para git y el proyecto
-workflows/  el grafo del apply como script de la herramienta Workflow
-skills/     skills que precargan los agentes, como el checklist OWASP del security-auditor
-scripts/    instalador, verificador de @DisplayName, verificador de contrato de proyecto, validadores de agentes y workflows, y pruebas
-docs/       documentación, y ejemplos de los archivos del proyecto en docs/ejemplos/
-.github/    CI: valida los agentes, prueba los hooks y revisa la sintaxis del workflow
+agents/     fuente única de los roles (markdown neutro)
+dist/       adaptadores generados: claude, opencode, gemini, prompts y AGENTS.md
+scripts/    generar y validar, instalar, verificar escritura por git, preparar worktree del tester
+scripts/test/  pruebas (node --test, sin dependencias)
+docs/       diseño, hosts y uso
+.github/    CI: valida, prueba y verifica que dist/ esté al día
 ```
 
-Ninguno de los archivos contiene claves, tokens ni datos reales.
+Probado con Node 22 (el de CI). No hay dependencias npm.
+
+## Requisitos de OpenSpec
+
+Los roles usan la CLI `openspec`: `instructions apply --json`, `show --deltas-only` y `validate --strict`. Comprobados contra la 1.16.0; en otras versiones, verificar antes de usar.

@@ -1,135 +1,78 @@
 #!/usr/bin/env node
-// Valida el frontmatter de los agentes del repo, para que una edición no rompa la instalación
-// ni deje a un agente de solo lectura con herramientas de escritura.
-// Uso (desde la raíz del repo): node scripts/validar-agentes.js
-// Sale con 0 si todo está bien y con 1 si hay problemas. Lista cada problema con su archivo.
+'use strict';
+// Valida la fuente canónica (agents/): frontmatter, formatos de reporte y ausencia de
+// nombres de modelo o de host en el texto. Sale con 0 si todo está bien, con 1 si no.
+// Uso: node scripts/validar-agentes.js [carpeta]   (por defecto, agents/ de este repo)
 
-const fs = require('fs');
 const path = require('path');
+const { cargarRoles, ACCESOS, CAMPOS } = require('./lib/canon');
 
-const raiz = path.resolve(__dirname, '..');
-const carpetaAgentes = path.join(raiz, 'agents');
-const carpetaHooks = path.join(raiz, 'hooks');
-const carpetaSkills = path.join(raiz, 'skills');
+const RAIZ = path.resolve(__dirname, '..');
 
-const MODELOS = ['haiku', 'sonnet', 'opus'];
-const SOLO_LECTURA = ['revisor', 'security-auditor'];
-const ESCRITURA = ['Write', 'Edit', 'NotebookEdit'];
+// Nada de esto puede aparecer en el texto canónico: si aparece, el rol deja de ser portable.
+const PROHIBIDO = /\$CLAUDE_PROJECT_DIR|\.claude\/|\.opencode|\.gemini|\.codex|\.kimi|subagent_type|\bTask tool\b|\/opsx:|\b(claude|haiku|sonnet|opus|gpt|gemini|kimi|deepseek|codex|opencode)\b/gi;
 
-/** Separa el frontmatter (entre dos líneas `---`) del cuerpo. Devuelve null si no hay frontmatter. */
-function leerFrontmatter(texto) {
-	const partes = texto.replace(/\r\n/g, '\n').split(/^---\s*$/m);
-	if (partes.length < 3 || partes[0].trim() !== '') {
-		return null;
-	}
-	return partes[1];
-}
-
-/** Lee un campo de primer nivel con valor en la misma línea, por ejemplo `model: sonnet`. */
-function campo(fm, nombre) {
-	const m = new RegExp(`^${nombre}:[ \\t]*(.*)$`, 'm').exec(fm);
-	return m ? m[1].trim() : null;
-}
-
-/** Lista las herramientas de `tools: A, B, C`. */
-function herramientas(fm) {
-	const valor = campo(fm, 'tools');
-	return valor ? valor.split(',').map(h => h.trim()).filter(Boolean) : null;
-}
-
-/** Lista las skills precargadas en `skills:` (una por línea con guion). */
-function skillsDeAgente(fm) {
-	const bloque = /^skills:[ \t]*\n((?:[ \t]+-[ \t]+.+\n?)+)/m.exec(fm);
-	if (!bloque) {
-		return [];
-	}
-	return bloque[1].split('\n').map(l => l.replace(/^[ \t]+-[ \t]+/, '').trim()).filter(Boolean);
-}
-
-/** Devuelve las rutas de `command:` de los hooks, por ejemplo `.claude/hooks/x.js`. */
-function rutasDeHooks(fm) {
-	const rutas = [];
-	for (const m of fm.matchAll(/command:\s*node\s+"?\$CLAUDE_PROJECT_DIR\/(\.claude\/hooks\/[^"\s]+)"?/g)) {
-		rutas.push(m[1]);
-	}
-	return rutas;
-}
-
-function validar() {
+/** Devuelve la lista de problemas encontrados en la carpeta. Lista vacía = todo bien. */
+function validar(dir) {
 	const problemas = [];
-	const archivos = fs.readdirSync(carpetaAgentes).filter(f => f.endsWith('.md'));
-	if (archivos.length === 0) {
-		problemas.push('agents/: no hay agentes');
+	const roles = cargarRoles(dir);
+	if (roles.length === 0) {
+		problemas.push(`${dir}: no hay roles .md`);
 	}
+	const nombres = new Set();
 
-	for (const archivo of archivos) {
-		const rel = `agents/${archivo}`;
-		const texto = fs.readFileSync(path.join(carpetaAgentes, archivo), 'utf8');
-		const fm = leerFrontmatter(texto);
-		if (fm === null) {
+	for (const rol of roles) {
+		const rel = rol.archivo;
+		if (!rol.meta) {
 			problemas.push(`${rel}: falta el frontmatter (bloque entre dos líneas ---)`);
 			continue;
 		}
-
-		const nombre = campo(fm, 'name');
-		const base = path.basename(archivo, '.md');
-		if (nombre !== base) {
-			problemas.push(`${rel}: name "${nombre}" no coincide con el nombre del archivo "${base}"`);
-		}
-		if (!campo(fm, 'description')) {
-			problemas.push(`${rel}: falta description (es lo que usa Claude para elegir el agente)`);
-		}
-
-		const modelo = campo(fm, 'model');
-		if (modelo && !MODELOS.includes(modelo)) {
-			problemas.push(`${rel}: model "${modelo}" no es uno de ${MODELOS.join(', ')}`);
-		}
-
-		const tools = herramientas(fm);
-		if (SOLO_LECTURA.includes(base) && tools) {
-			const escritura = tools.filter(t => ESCRITURA.includes(t));
-			if (escritura.length > 0) {
-				problemas.push(`${rel}: agente de solo lectura con herramientas de escritura: ${escritura.join(', ')}`);
+		for (const campo of CAMPOS) {
+			if (!rol.meta[campo]) {
+				problemas.push(`${rel}: falta el campo "${campo}"`);
 			}
 		}
-		if (!fm.includes('sin-escritura.js')) {
-			problemas.push(`${rel}: sin la guarda sin-escritura.js; ningún agente commitea, eso es del orquestador`);
+		const base = path.basename(rel, '.md');
+		if (rol.meta.name && rol.meta.name !== base) {
+			problemas.push(`${rel}: name "${rol.meta.name}" no coincide con el nombre del archivo`);
 		}
-		else if (SOLO_LECTURA.includes(base) && !fm.includes('sin-escritura.js" --solo-lectura')) {
-			problemas.push(`${rel}: agente de solo lectura con la guarda sin --solo-lectura`);
+		if (nombres.has(rol.meta.name)) {
+			problemas.push(`${rel}: name "${rol.meta.name}" repetido`);
 		}
-
-		for (const ruta of rutasDeHooks(fm)) {
-			const archivoHook = path.join(carpetaHooks, path.basename(ruta));
-			if (!fs.existsSync(archivoHook)) {
-				problemas.push(`${rel}: el hook ${ruta} no existe en hooks/`);
+		nombres.add(rol.meta.name);
+		if (rol.meta.name && !/^[a-z][a-z0-9-]*$/.test(rol.meta.name)) {
+			problemas.push(`${rel}: name debe ser minúsculas, números y guiones`);
+		}
+		if (rol.meta.acceso && !ACCESOS.includes(rol.meta.acceso)) {
+			problemas.push(`${rel}: acceso "${rol.meta.acceso}" debe ser lectura o escritura`);
+		}
+		if (rol.meta.description && rol.meta.description.length < 40) {
+			problemas.push(`${rel}: description muy corta; es lo que usa el host para decidir cuándo delegar`);
+		}
+		for (const seccion of ['## Rol', '## Procedimiento', '## Reglas', '## Reporte']) {
+			if (!rol.cuerpo.includes(seccion)) {
+				problemas.push(`${rel}: falta la sección "${seccion}"`);
 			}
 		}
-
-		for (const skill of skillsDeAgente(fm)) {
-			// Las skills openspec-* las instala la CLI de OpenSpec, no este repo.
-			if (skill.startsWith('openspec-')) {
-				continue;
-			}
-			const archivoSkill = path.join(carpetaSkills, skill, 'SKILL.md');
-			if (!fs.existsSync(archivoSkill)) {
-				problemas.push(`${rel}: la skill ${skill} no existe en skills/${skill}/SKILL.md`);
-				continue;
-			}
-			const nombreSkill = campo(leerFrontmatter(fs.readFileSync(archivoSkill, 'utf8')) ?? '', 'name');
-			if (nombreSkill !== skill) {
-				problemas.push(`skills/${skill}/SKILL.md: name "${nombreSkill}" no coincide con la carpeta "${skill}"`);
-			}
+		if (rol.meta.name === 'revisor' && !rol.cuerpo.includes('VEREDICTO: APROBADO')) {
+			problemas.push(`${rel}: el revisor debe declarar el formato de VEREDICTO`);
+		}
+		const texto = `${rol.meta.description}\n${rol.cuerpo}`;
+		for (const m of new Set(texto.match(PROHIBIDO) || [])) {
+			problemas.push(`${rel}: contiene "${m}", que ata el rol a un modelo o a un host`);
 		}
 	}
 	return problemas;
 }
 
-const problemas = validar();
-if (problemas.length > 0) {
-	for (const p of problemas) {
-		console.log(`PROBLEMA  ${p}`);
+if (require.main === module) {
+	const dir = process.argv[2] ? path.resolve(process.argv[2]) : path.join(RAIZ, 'agents');
+	const problemas = validar(dir);
+	if (problemas.length) {
+		console.error(problemas.map(p => `- ${p}`).join('\n'));
+		process.exit(1);
 	}
-	process.exit(1);
+	console.log(`OK: ${cargarRoles(dir).length} roles válidos en ${dir}`);
 }
-console.log('OK: los agentes tienen frontmatter válido y sus hooks existen');
+
+module.exports = { validar };

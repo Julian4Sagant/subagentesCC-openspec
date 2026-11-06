@@ -1,9 +1,0 @@
-# Ejemplo de openspec/config.yaml: el campo `context` que lee el implementador.
-# Ajustá las claves al formato que genere `openspec init` en tu versión de la CLI.
-# Los datos son ficticios.
-
-context: |
-  Arquitectura: servicio HTTP en capas (controller, service, repository).
-  Contrato: las rutas, los JSON y los errores están en openspec/specs/.
-  Versionado: cada cambio de comportamiento empieza con /opsx:propose.
-  Tests: cada Scenario de la spec tiene al menos un test automatizado.
